@@ -179,6 +179,95 @@ input{font-family:inherit}
 .actions{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:22px}
 #confetti{position:fixed;inset:0;pointer-events:none;z-index:80}
 .sndbtn.off{opacity:.45}
+.tools{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px}
+.tool{font-size:clamp(17px,2vw,22px)}
+.tool svg{width:min(90px,62%)}
+.pphoto{width:100%;aspect-ratio:1;object-fit:cover;border-radius:20px;display:block}
+.av .pphoto{max-height:260px}
+.photoBox{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.photoPrev{width:130px;height:130px;border-radius:24px;background:var(--doc-l);display:grid;place-items:center;overflow:hidden;font-size:48px}
+.photoPrev img{width:100%;height:100%;object-fit:cover}
+.back-banner{display:flex;gap:14px;align-items:center;background:#fff7d6;border-radius:20px;padding:12px 14px;margin:8px 0 4px;font-size:19px}
+.back-banner .bp{width:84px;height:84px;border-radius:16px;overflow:hidden;flex:none;display:grid;place-items:center;background:#fff}
+.back-banner .bp img{width:100%;height:100%;object-fit:cover}.back-banner .bp svg{height:100%;width:auto}
+.plist{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:16px}
+.pc{background:#fff;border-radius:26px;padding:10px;box-shadow:0 7px 0 rgba(0,0,0,.07);text-align:center;position:relative;color:var(--ink);font-size:21px;font-weight:600;cursor:pointer}
+.pc:active{transform:translateY(3px)}
+.pc .pic{height:150px;display:grid;place-items:center;overflow:hidden;border-radius:18px;background:var(--doc-l);margin-bottom:6px}
+.pc .pic img{width:100%;height:100%;object-fit:cover}.pc .pic svg{height:100%;width:auto}
+.pc small{display:block;font-size:15px;font-weight:500;opacity:.7}
+.pc .stk{display:flex;gap:2px;justify-content:center;min-height:28px;margin-top:4px}
+.pc .stk svg{width:26px;height:26px}
+.pc .del{position:absolute;top:8px;right:8px;background:#fff;border-radius:12px;padding:5px 9px;font-size:15px;box-shadow:0 2px 0 rgba(0,0,0,.12);font-weight:600;color:var(--bad)}
+.pc.new{display:grid;place-items:center;border:4px dashed var(--doc);background:var(--doc-l);min-height:230px;font-size:24px;color:var(--doc);line-height:1.2}
+.pc.new b{font-size:60px;display:block}
+.notes li svg,#hist li svg{width:26px;height:26px;vertical-align:middle}
+.otowrap{display:flex;flex-direction:column;align-items:center;gap:12px}
+.seg{display:flex;gap:10px;flex-wrap:wrap}
+.seg .choice{min-width:150px;flex:none;padding:8px 14px}
+.otoview{width:min(50vh,380px);aspect-ratio:1;border-radius:50%;overflow:hidden;position:relative;background:#2b1a1a;border:14px solid #3a3f4b;box-shadow:inset 0 0 40px rgba(0,0,0,.8)}
+.otoview video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scale(1.8)}
+.otoview svg{position:absolute;inset:0;width:100%;height:100%}
+.otoview.cam #otosvg{display:none}
+.otoview .flash{position:absolute;inset:0;background:radial-gradient(circle,rgba(255,255,220,.8),rgba(255,255,200,0) 70%);opacity:0;transition:opacity .3s;pointer-events:none}
+.otoview.lit .flash{opacity:1}
+.otoview:after{content:"";position:absolute;inset:0;border-radius:50%;box-shadow:inset 0 0 50px 20px rgba(0,0,0,.65);pointer-events:none}
+.vacstage{position:relative;display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap;min-height:230px}
+.vacstage .vp{width:170px;height:200px;display:grid;place-items:center;overflow:hidden;border-radius:20px;background:var(--doc-l)}
+.vacstage .vp img{width:100%;height:100%;object-fit:cover}.vacstage .vp svg{height:100%;width:auto}
+.count{font-size:130px;font-weight:700;color:var(--doc);position:absolute;inset:0;display:grid;place-items:center;pointer-events:none;text-shadow:0 6px 0 rgba(0,0,0,.12)}
+#plunger{transition:transform .9s ease-in}
+#liquid{transform-box:fill-box;transform-origin:right center;transition:transform .9s ease-in}
+.stickers{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:10px}
+.stickers button{background:var(--doc-l);border-radius:20px;padding:8px;border:4px solid transparent}
+.stickers button.sel{border-color:var(--doc);background:#fff}
+.stickers svg{width:70px;height:70px}
+.ultra canvas{width:100%;max-height:50vh;object-fit:contain;background:#000;border-radius:20px;display:block}
+.scalewrap{display:flex;gap:30px;justify-content:center;align-items:flex-end;flex-wrap:wrap}
+.cstage{position:relative;width:min(100%,560px);aspect-ratio:4/3;margin:0 auto;border-radius:20px;overflow:hidden;background:var(--doc-l);touch-action:none}
+.cstage>.bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
+.cstage>.bgsvg{position:absolute;inset:0;display:flex;justify-content:center;pointer-events:none}.cstage>.bgsvg svg{height:100%;width:auto}
+.stk-item{position:absolute;width:22%;touch-action:none;cursor:grab}
+.stk-item svg{width:100%;height:auto;display:block;pointer-events:none}
+.stk-item.sel{outline:4px dashed var(--doc);outline-offset:4px;border-radius:10px}
+.palette{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:12px}
+.palette button{background:var(--doc-l);border-radius:18px;padding:6px;width:84px;height:70px}
+.palette svg{width:100%;height:100%}
+.ctrls{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:10px}
+.ctrls button{background:#fff;border:3px solid var(--doc);color:var(--doc);border-radius:16px;padding:8px 14px;font-size:18px;font-weight:600}
+.espera{display:grid;grid-template-columns:1fr 1.2fr;gap:20px}
+@media (max-width:760px){.espera{grid-template-columns:1fr}}
+.painel{background:#10243a;color:#fff;border-radius:30px;padding:24px;text-align:center;box-shadow:0 8px 0 rgba(0,0,0,.15)}
+.painel .sn{font-size:clamp(56px,9vw,100px);font-weight:700;color:#ffd43b;letter-spacing:6px;font-family:'Courier New',monospace}
+.painel .nmc{font-size:clamp(28px,4vw,46px);font-weight:700}
+.painel .dc{font-size:22px;opacity:.85;margin-top:6px;min-height:28px}
+.painel.flash{animation:pflash .4s 5}
+@keyframes pflash{50%{background:#2f6bab}}
+.qlist li{display:flex;align-items:center;gap:10px}
+.qp{width:48px;height:48px;border-radius:12px;overflow:hidden;background:#fff;flex:none;display:grid;place-items:center;font-size:28px}
+.qp img{width:100%;height:100%;object-fit:cover}.qp svg{height:100%;width:auto}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 12px}
+.chips button{background:var(--doc-l);border-radius:16px;padding:10px 16px;font-size:19px;font-weight:600;color:var(--ink);box-shadow:0 3px 0 rgba(0,0,0,.08)}
+#amb{position:fixed;inset:0;z-index:90;display:none;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center;animation:siren .5s infinite;overflow:hidden;padding:20px}
+#amb.on{display:flex}
+@keyframes siren{0%,49%{background:#d90429}50%,100%{background:#1d4ed8}}
+#amb h1{font-size:clamp(46px,9vw,96px);margin:0;text-shadow:0 6px 0 rgba(0,0,0,.25)}
+#amb p{font-size:clamp(20px,3vw,32px);margin:6px 0 20px}
+.ambcar{position:absolute;bottom:30px;width:340px;animation:drive 4.5s linear infinite}
+@keyframes drive{from{left:-360px}to{left:100%}}
+.blink{animation:pulse .25s infinite}
+.homebtns{display:flex;gap:16px;justify-content:center;margin-top:26px;flex-wrap:wrap}
+.redbig{background:#e03131!important;color:#fff!important}
+.receita .rxline svg{width:40px;height:40px;vertical-align:middle}
+@media print{
+  body{background:#fff}
+  body *{visibility:hidden}
+  #receitaBox,#receitaBox *{visibility:visible}
+  #receitaBox{position:absolute;left:0;top:0;width:100%;box-shadow:none;animation:none}
+  #confetti{display:none}
+}
+
+.camview .face .pphoto{height:100%;width:auto}
 </style>
 </head>
 <body>
@@ -192,12 +281,33 @@ input{font-family:inherit}
     <button class="doccard" onclick="pickDoctor('helena')" id="dc-helena"></button>
     <button class="doccard" onclick="pickDoctor('valentina')" id="dc-valentina"></button>
   </div>
+  <div class="homebtns"><button class="big alt" onclick="openEspera()">🪑 Sala de espera</button><button class="big redbig" onclick="openAmb()">🚑 Ambulância</button></div>
+</section>
+
+<!-- PACIENTES -->
+<section id="pacientes" class="screen">
+  <div class="topbar"><button class="iconbtn" onclick="go('home')" aria-label="Voltar">←</button><h2 id="pacTitle">Pacientes</h2><button class="iconbtn" onclick="openAmb()" aria-label="Ambulância">🚑</button><button class="iconbtn sndbtn" onclick="toggleSound()">🔊</button></div>
+  <div class="plist" id="plist"></div>
+</section>
+
+<!-- SALA DE ESPERA -->
+<section id="espera" class="screen">
+  <div class="topbar"><button class="iconbtn" onclick="go('home')" aria-label="Voltar">←</button><h2>Sala de espera</h2><button class="iconbtn sndbtn" onclick="toggleSound()">🔊</button></div>
+  <div class="espera">
+    <div class="pcard"><h3 style="margin:4px 0">Quem chegou?</h3><div class="chips" id="eChips"></div>
+      <div class="row"><input id="eName" class="txt" placeholder="Nome de um paciente novo" maxlength="22" autocomplete="off"><button class="iconbtn" onclick="addQueueNew()" aria-label="Adicionar">＋</button></div>
+      <div class="notes"><h3>Esperando</h3><ul class="qlist" id="eQueue"></ul></div></div>
+    <div><div class="painel" id="painel"><div style="font-size:20px;opacity:.8">SENHA</div><div class="sn" id="pSenha">---</div><div class="nmc" id="pNm">Aguardando</div><div class="dc" id="pDc"></div></div>
+      <div class="actions"><button class="big" style="background:#7c5cff" onclick="callNext('helena')">Chamar: Dra. Helena</button><button class="big" style="background:#ff4f8b" onclick="callNext('valentina')">Chamar: Dra. Valentina</button></div>
+      <div class="actions"><button class="big hidden" id="atenderBtn" onclick="atender()">Atender agora</button></div></div>
+  </div>
 </section>
 
 <!-- FICHA / PRONTUARIO -->
 <section id="ficha" class="screen">
-  <div class="topbar"><button class="iconbtn" onclick="go('home')" aria-label="Voltar">←</button><h2 id="fichaTitle">Prontuário</h2><button class="iconbtn sndbtn" onclick="toggleSound()">🔊</button></div>
+  <div class="topbar"><button class="iconbtn" onclick="showPacientes()" aria-label="Voltar">←</button><h2 id="fichaTitle">Prontuário</h2><button class="iconbtn sndbtn" onclick="toggleSound()">🔊</button></div>
   <div class="paper">
+    <div id="backBanner" class="back-banner hidden"></div>
     <div class="label">Quem é o paciente?</div>
     <div class="choices" id="kindCh">
       <button class="choice" data-v="pessoa" onclick="setKind('pessoa')"><span id="icoPessoa"></span>Pessoa</button>
@@ -216,6 +326,8 @@ input{font-family:inherit}
         <button class="choice" data-v="f" onclick="setSex('f')" id="sexF">Menina</button>
         <button class="choice" data-v="m" onclick="setSex('m')" id="sexM">Menino</button>
       </div>
+      <div class="label">Foto do paciente</div>
+      <div class="photoBox"><div class="photoPrev" id="photoPrev">📷</div><button class="big alt" onclick="takePhoto('ficha')">Tirar foto</button><button class="big alt hidden" id="photoDel" onclick="S.form.photo=null;refreshPhoto()">Apagar foto</button></div>
       <div class="label">Nome do paciente</div>
       <div class="row">
         <input id="pName" class="txt" maxlength="22" placeholder="Digite o nome" autocomplete="off">
@@ -237,7 +349,7 @@ input{font-family:inherit}
 
 <!-- CONSULTA -->
 <section id="consulta" class="screen">
-  <div class="topbar"><button class="iconbtn" onclick="go('ficha')" aria-label="Voltar">←</button><h2 id="consTitle">Consulta</h2><button class="iconbtn sndbtn" onclick="toggleSound()">🔊</button></div>
+  <div class="topbar"><button class="iconbtn" onclick="go('ficha')" aria-label="Voltar">←</button><h2 id="consTitle">Consulta</h2><button class="iconbtn" onclick="openAmb()" aria-label="Ambulância">🚑</button><button class="iconbtn sndbtn" onclick="toggleSound()">🔊</button></div>
   <div class="consult">
     <div class="pcard">
       <div class="av" id="pAvatar"></div>
@@ -245,6 +357,7 @@ input{font-family:inherit}
       <div class="pinfo" id="pInfoShow"></div>
       <div class="bubble"><button onclick="say(S.p.complaint)" aria-label="Ouvir">🔈</button><span id="pComplaint"></span></div>
       <div class="notes"><h3>Anotações do prontuário</h3><ul id="notes"></ul></div>
+      <div class="notes hidden" id="histBox"><h3>Consultas anteriores</h3><ul id="hist"></ul></div>
     </div>
     <div>
       <div class="tools" id="tools"></div>
@@ -272,11 +385,19 @@ input{font-family:inherit}
 <section id="receita" class="screen">
   <div class="receita" id="receitaBox"></div>
   <div class="actions">
-    <button class="big" onclick="newPatient()">Próximo paciente</button>
+    <button class="big" onclick="printRx()">🖨️ Imprimir</button>
+    <button class="big" onclick="showPacientes()">Próximo paciente</button>
     <button class="big alt" onclick="go('home')">Trocar de doutora</button>
   </div>
 </section>
 
+<input type="file" id="photoIn" accept="image/*" capture="environment" class="hidden" onchange="photoChosen(this)">
+<div id="amb"><h1>EMERGÊNCIA!</h1><p>A ambulância está chegando!</p>
+  <div class="actions"><button class="big" style="background:#fff;color:#d90429" onclick="closeAmb(true)">Chegou! Atender agora</button><button class="big alt" onclick="closeAmb(false)">Desligar a sirene</button></div>
+  <svg class="ambcar" viewBox="0 0 340 170"><rect x="140" y="10" width="40" height="14" rx="4" fill="#ff1f3d" class="blink"/><rect x="182" y="10" width="40" height="14" rx="4" fill="#3d7bff"/>
+    <rect x="10" y="24" width="230" height="110" rx="12" fill="#fff"/><path d="M240 50 H290 Q316 54 326 96 V134 H240Z" fill="#fff"/><path d="M250 60 H286 Q304 64 312 94 H250Z" fill="#9ad0ff"/>
+    <rect x="10" y="96" width="316" height="14" fill="#ff1f3d"/><path d="M110 46 h20 v20 h20 v20 h-20 v20 h-20 v-20 h-20 v-20 h20Z" fill="#ff1f3d" transform="translate(-5 -12) scale(.8)"/>
+    <circle cx="80" cy="140" r="24" fill="#2b2b2b"/><circle cx="80" cy="140" r="10" fill="#aaa"/><circle cx="270" cy="140" r="24" fill="#2b2b2b"/><circle cx="270" cy="140" r="10" fill="#aaa"/></svg></div>
 <div id="overlay"><div class="panel" id="panel"></div></div>
 <canvas id="confetti"></canvas>
 
@@ -650,14 +771,15 @@ function pickDoctor(id){
   click();S.doc=DOCS[id];
   document.documentElement.style.setProperty('--doc',S.doc.color);
   document.documentElement.style.setProperty('--doc-l',S.doc.light);
-  say(`Olá, ${S.doc.name.replace('Dra.','Doutora')}! Vamos atender um paciente.`);
-  newPatient();
+  say(`Olá, ${S.doc.name.replace('Dra.','Doutora')}! Quem vamos atender?`);
+  showPacientes();
 }
 
 /* ============ FICHA ============ */
-function newPatient(){
-  S.form={kind:null,species:null,sex:null,queixa:null};
-  $('#pName').value='';$('#pAge').value=8;
+function newPatient(prefName){
+  S.form={kind:null,species:null,sex:null,queixa:null,photo:null};S.editing=null;
+  $('#backBanner').classList.add('hidden');
+  $('#pName').value=typeof prefName==='string'?prefName:'';$('#pAge').value=8;
   $('#fichaTitle').textContent='Prontuário da '+S.doc.name;
   refreshFicha();go('ficha');
 }
@@ -675,7 +797,7 @@ function refreshFicha(){
   else if(age<13){$('#sexLabel').textContent='É menina ou menino?';$('#sexF').textContent='Menina';$('#sexM').textContent='Menino';}
   else{$('#sexLabel').textContent='É mulher ou homem?';$('#sexF').textContent='Mulher';$('#sexM').textContent='Homem';}
   $('#ageUnit').textContent=age===1?'ano':'anos';
-  renderQueixas();
+  renderQueixas();refreshPhoto();
 }
 const QUEIXAS=[{v:'febre',t:'Febre',ic:()=>IC.thermo('#ff4d5e')},{v:'fratura',t:'Machucou',ic:()=>IC.broken('#ff4d5e')},{v:'barriga',t:'Dor de barriga',ic:()=>IC.tummy('#8a5cf6')},{v:'pressao',t:'Dor de cabeça',ic:()=>IC.gauge('#ff4d5e'),adult:true},{v:'saudavel',t:'Check-up',ic:()=>IC.happy('#ffd43b')},{v:'misterio',t:'Não sei',ic:()=>`<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="26" fill="#b197fc"/><text x="32" y="44" font-size="34" text-anchor="middle" font-family="Fredoka" font-weight="700" fill="#fff">?</text></svg>`}];
 function renderQueixas(){const f=S.form,age=+$('#pAge').value||0;const list=QUEIXAS.filter(q=>!q.adult||(f.kind==='pessoa'&&age>=30));
@@ -695,9 +817,19 @@ function startConsult(){
   if(!f.sex){$('#sexCh').classList.add('shake');setTimeout(()=>$('#sexCh').classList.remove('shake'),400);say($('#sexLabel').textContent);return}
   if(!name){$('#pName').classList.add('shake');setTimeout(()=>$('#pName').classList.remove('shake'),400);say('Qual é o nome do paciente?');$('#pName').focus();return}
   let age=Math.max(1,Math.min(f.kind==='pet'?25:110,parseInt($('#pAge').value)||1));
-  const p={kind:f.kind,species:f.species,sex:f.sex,name,age};
-  p.look=f.kind==='pessoa'?{skin:pick(SKINS),hair:pick(HAIRS),shirt:pick(SHIRTS),pants:pick(['#3d5a80','#5c4b8a','#2f6f62','#7a4e2d']),bow:pick(['#ff5c9a','#ffd23f','#4dabf7','#69db7c']),motif:pick(['star','heart','stripe'])}:{fur:pick(f.species==='cachorro'?DOGC:CATC),pattern:Math.random()<.5?1:0};
-  makeCase(p);S.p=p;S.done={};S.notes=[];S.diag=null;S.rxSel=new Set();
+  let rec=S.editing?recById(S.editing):null;
+  if(rec){
+    if(rec.kind!==f.kind||rec.species!==f.species){rec.look=newLook(f.kind,f.species);rec.base=null}
+    Object.assign(rec,{kind:f.kind,species:f.species,sex:f.sex,name,age,photo:f.photo||null});
+  }else{
+    rec={id:'p'+Date.now().toString(36)+Math.floor(Math.random()*1000),kind:f.kind,species:f.species,sex:f.sex,name,age,photo:f.photo||null,look:newLook(f.kind,f.species),visits:[],base:null};
+    DB.patients.push(rec);S.editing=rec.id;
+  }
+  rec.last=Date.now();saveDB();
+  const p={kind:rec.kind,species:rec.species,sex:rec.sex,name:rec.name,age:rec.age,look:rec.look,photo:rec.photo};
+  S.rec=rec;S.visit={date:Date.now(),doc:S.doc.id};S.visitSaved=false;S.otoFind=null;S.baby=null;S.meas=null;
+  makeCase(p);if(rec.visits.length&&p.kind==='pessoa')p.complaint='Voltei! '+p.complaint;
+  S.p=p;S.done={};S.notes=[];S.diag=null;S.rxSel=new Set();
   renderConsult();go('consulta');
   setTimeout(()=>say(p.complaint),350);
 }
@@ -740,7 +872,9 @@ function sexWord(p){if(p.kind==='pet')return p.sex==='f'?'fêmea':'macho';if(p.a
 function renderConsult(){
   const p=S.p;
   $('#consTitle').textContent=(p.kind==='pet'?'Consulta veterinária':'Consulta médica')+' • '+S.doc.name;
-  $('#pAvatar').innerHTML=avatar(p,{sad:p.cond!=='saudavel'});
+  $('#pAvatar').innerHTML=pic(p,{sad:p.cond!=='saudavel'});
+  const hv=S.rec.visits.slice(-4).reverse();$('#histBox').classList.toggle('hidden',!hv.length);
+  $('#hist').innerHTML=hv.map(v=>`<li>${fmtDate(v.date)} • ${DOCS[v.doc]?DOCS[v.doc].name:''}: <b>${diagName(p,v.diag)}</b> ${v.sticker?STICKERS[v.sticker]:''}</li>`).join('');
   $('#pNameShow').textContent=p.name;
   $('#pInfoShow').textContent=(p.kind==='pet'?(p.species==='cachorro'?'Cachorro':'Gato'):'Pessoa')+', '+sexWord(p)+', '+p.age+(p.age===1?' ano':' anos');
   $('#pComplaint').textContent=p.complaint;
@@ -767,8 +901,9 @@ function lockedTool(why){oops();say('A pressão é medida '+why.toLowerCase().re
 
 /* ============ OVERLAY ============ */
 function openPanel(title,html){$('#panel').innerHTML=`<div class="ph"><h2>${title}</h2><button class="iconbtn" onclick="closeTool()" aria-label="Fechar">✕</button></div>${html}`;$('#overlay').classList.add('on')}
-function closeTool(){stopAudio();stopCam();cancelAnimationFrame(window._raf);clearInterval(window._ti);$('#overlay').classList.remove('on')}
-function openTool(id){click();({xray:openXray,thermo:openThermo,bp:openBP,stetho:openStetho})[id]()}
+function closeTool(){stopAudio();stopCam();clearLater();S.torch=false;cancelAnimationFrame(window._raf);clearInterval(window._ti);$('#overlay').classList.remove('on')}
+const TOOL_OPEN={xray:()=>openXray(),thermo:()=>openThermo(),bp:()=>openBP(),stetho:()=>openStetho()};
+function openTool(id){click();TOOL_OPEN[id]()}
 
 /* ---- RAIO-X ---- */
 function openXray(){
@@ -835,7 +970,7 @@ function openThermo(){
   const p=S.p,canCam=!!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia);
   openPanel('Termômetro digital',`
    <div class="camview" id="camview">
-     <div class="face" id="tface">${avatar(p,{sad:p.cond!=='saudavel'})}</div>
+     <div class="face" id="tface">${pic(p,{sad:p.cond!=='saudavel'})}</div>
      <video id="camvid" playsinline muted autoplay class="hidden"></video>
      <svg class="cross" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="#fff" stroke-width="4" stroke-dasharray="14 10"/><path d="M50 0 v22 M50 78 v22 M0 50 h22 M78 50 h22" stroke="#fff" stroke-width="4"/><circle cx="50" cy="50" r="40" fill="none" stroke="#ff2d4a" stroke-width="2" stroke-dasharray="14 10"/></svg>
      <div class="laser" id="laser"></div>
@@ -876,7 +1011,7 @@ function runThermo(){
   function finish(){
     $('#laser').classList.remove('on');$('#tbtn').disabled=false;
     const fever=p.cond==='febre';
-    lcd.classList.add(fever?'hot':'okc');
+    lcd.classList.add(fever?'hot':'okc');S.visit.temp=target;
     tone(fever?880:2000,.5,'square',.08);if(fever)tone(880,.5,'square',.08,.6);
     const ref=pet?` Para ${p.species==='cachorro'?'cachorro':'gato'}, até 39,2 °C é normal.`:' Para pessoas, até 37,5 °C é normal.';
     if(fever){$('#tres').innerHTML=`<span class="bad">${fmt(target)} °C: está com febre!</span><div style="font-size:17px;font-weight:500;margin-top:4px">${ref}</div>`;
@@ -994,19 +1129,429 @@ function showReceita(sel){
   const logo=p.kind==='pet'?`<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="${d.color}"/><ellipse cx="32" cy="40" rx="11" ry="9" fill="#fff"/><circle cx="19" cy="27" r="5" fill="#fff"/><circle cx="27" cy="19" r="5" fill="#fff"/><circle cx="37" cy="19" r="5" fill="#fff"/><circle cx="45" cy="27" r="5" fill="#fff"/></svg>`
     :`<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="${d.color}"/><path d="M32 16 v32 M16 32 h32" stroke="#fff" stroke-width="10" stroke-linecap="round"/></svg>`;
   const items=sel.map(id=>MEDS[p.kind].find(m=>m.id===id)).map(m=>`<div class="rxitem">${m.ic}<div><b>${m.name}</b><div>${m.txt}</div></div></div>`).join('');
-  const hoje=new Date().toLocaleDateString('pt-BR');
+  const hoje=new Date().toLocaleDateString('pt-BR');const V=S.visit;
+  let extra='';
+  if(V.temp)extra+=`<div class="rxline"><b>Temperatura:</b> ${fmt(V.temp)} °C</div>`;
+  if(V.h)extra+=`<div class="rxline"><b>Altura e peso:</b> ${V.h} cm, ${fmt(V.w)} kg</div>`;
+  if(V.sticker)extra+=`<div class="rxline"><b>Adesivo de corajoso:</b> ${STICKERS[V.sticker]}</div>`;
+  if(V.curPhoto)extra+=`<div class="rxline"><b>Curativo:</b><br><img src="${V.curPhoto}" alt="" style="width:240px;max-width:100%;border-radius:12px;margin-top:4px"></div>`;
   $('#receitaBox').innerHTML=`
-   <div class="rxhead">${logo}<div><h2>${p.kind==='pet'?'Clínica Veterinária':'Consultório'} da ${d.name}</h2><small>Receita • ${hoje}</small></div></div>
+   <div class="rxhead">${logo}<div><h2>${p.kind==='pet'?'Clínica Veterinária':'Consultório'} da ${d.name}</h2><small>Receita • ${hoje}</small></div>${p.photo?`<img src="${p.photo}" alt="" style="width:86px;height:86px;border-radius:16px;object-fit:cover;margin-left:auto">`:''}</div>
    <div class="rxline"><b>Paciente:</b> ${esc(p.name)} (${p.kind==='pet'?(p.species==='cachorro'?'cachorro':'gato')+', ':''}${sexWord(p)}, ${p.age} ${p.age===1?'ano':'anos'})</div>
    <div class="rxline"><b>Diagnóstico:</b> ${dg.name}</div>
+   ${extra}
    <div class="rxline" style="margin-top:12px"><b>Tratamento:</b></div>
    ${items}
    <div class="rxline" style="margin-top:12px">Volte logo para contar se melhorou!</div>
    <div class="sign">${d.name}</div><div class="clear"></div>
    <div class="stamp">${d.name.toUpperCase()}<br>★ CRM ★<br>KIDS</div>`;
-  bump(d.id);go('receita');tada();confetti();
+  if(!S.visitSaved){V.diag=S.diag;V.meds=sel;V.notes=S.notes.map(stripTags);S.rec.visits.push(V);S.rec.last=Date.now();saveDB();S.visitSaved=true;bump(d.id)}
+  go('receita');tada();confetti();
   setTimeout(()=>say(`Receita pronta! ${p.name} vai ficar ${S.diag==='saudavel'?'protegid'+(p.sex==='f'?'a':'o'):'bo'+(p.sex==='f'?'a':'m')} rapidinho. Muito bem, ${d.name.replace('Dra.','doutora')}!`),300);
 }
+
+/* ============ BANCO DE PACIENTES ============ */
+const DBKEY='consultorio-pacientes';
+function loadDB(){try{const d=JSON.parse(localStorage.getItem(DBKEY));if(d&&d.patients)return d}catch(e){}return {patients:[],senha:0}}
+let DB=loadDB();
+function saveDB(){
+  try{localStorage.setItem(DBKEY,JSON.stringify(DB));return true}catch(e){
+    DB.patients.forEach(p=>p.visits.forEach((v,i)=>{if(i<p.visits.length-1)delete v.curPhoto}));
+    try{localStorage.setItem(DBKEY,JSON.stringify(DB));return true}catch(e2){return false}}
+}
+const recById=id=>DB.patients.find(p=>p.id===id);
+const diagName=(p,id)=>(DIAGS[p.kind].find(d=>d.id===id)||{}).name||'';
+const fmtDate=t=>new Date(t).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
+const stripTags=h=>String(h).replace(/<!--.*?-->/g,'').replace(/<[^>]+>/g,'').trim();
+function pic(p,opts){return p&&p.photo?`<img class="pphoto" src="${p.photo}" alt="">`:(p?avatar(p,opts||{}):'')}
+function newLook(kind,species){return kind==='pessoa'?{skin:pick(SKINS),hair:pick(HAIRS),shirt:pick(SHIRTS),pants:pick(['#3d5a80','#5c4b8a','#2f6f62','#7a4e2d']),bow:pick(['#ff5c9a','#ffd23f','#4dabf7','#69db7c']),motif:pick(['star','heart','stripe'])}:{fur:pick(species==='cachorro'?DOGC:CATC),pattern:Math.random()<.5?1:0}}
+function baseMetrics(r){
+  if(r.kind==='pessoa'){
+    if(r.age<18)return{h:Math.round(52+r.age*6.6+rnd(-3,3)),w:+(3.5+r.age*2.7+rnd(-1,2)).toFixed(1)};
+    return{h:Math.round((r.sex==='f'?161:174)+rnd(-6,6)),w:+((r.sex==='f'?60:76)+rnd(-7,10)).toFixed(1)}}
+  const pup=r.age<=1;
+  if(r.species==='cachorro')return{h:Math.round(rnd(25,60)*(pup?.6:1)),w:+(rnd(5,28)*(pup?.5:1)).toFixed(1)};
+  return{h:Math.round(rnd(22,28)*(pup?.7:1)),w:+(rnd(3,5.5)*(pup?.5:1)).toFixed(1)};
+}
+function setDoctor(id){
+  S.doc=DOCS[id];
+  document.documentElement.style.setProperty('--doc',S.doc.color);
+  document.documentElement.style.setProperty('--doc-l',S.doc.light);
+}
+
+/* ---- lista de pacientes ---- */
+function showPacientes(){
+  $('#pacTitle').textContent='Pacientes da '+S.doc.name;
+  const ps=[...DB.patients].sort((a,b)=>(b.last||0)-(a.last||0));
+  $('#plist').innerHTML=`<button class="pc new" onclick="newPatient()"><span><b>+</b>Paciente novo</span></button>`+ps.map(p=>{
+    const lv=p.visits[p.visits.length-1];
+    const stk=p.visits.filter(v=>v.sticker).slice(-6).map(v=>STICKERS[v.sticker]||'').join('');
+    return `<div class="pc" role="button" onclick="openPatient('${p.id}')"><button class="del" onclick="event.stopPropagation();delPatient(this,'${p.id}')">🗑</button><div class="pic">${pic(p)}</div>${esc(p.name)}<small>${p.visits.length} consulta${p.visits.length===1?'':'s'}${lv?' • '+diagName(p,lv.diag):''}</small><div class="stk">${stk}</div></div>`}).join('');
+  go('pacientes');
+}
+function delPatient(btn,id){
+  if(btn.dataset.armed){DB.patients=DB.patients.filter(p=>p.id!==id);saveDB();oops();showPacientes();return}
+  btn.dataset.armed=1;btn.textContent='Apagar?';
+  setTimeout(()=>{if(btn.isConnected){delete btn.dataset.armed;btn.textContent='🗑'}},3000);
+}
+function openPatient(id){
+  const r=recById(id);if(!r)return;click();
+  S.editing=id;
+  S.form={kind:r.kind,species:r.species,sex:r.sex,queixa:null,photo:r.photo||null};
+  $('#pName').value=r.name;$('#pAge').value=r.age;
+  $('#fichaTitle').textContent='Prontuário da '+S.doc.name;
+  refreshFicha();
+  const lv=r.visits[r.visits.length-1];
+  const bb=$('#backBanner');bb.classList.remove('hidden');
+  bb.innerHTML=`<div class="bp">${pic(r)}</div><div><b>Que bom te ver de novo, ${esc(r.name)}!</b><br>${lv?`Última consulta: ${diagName(r,lv.diag)} (${fmtDate(lv.date)}) com a ${DOCS[lv.doc]?DOCS[lv.doc].name:'doutora'}.`:'Primeira consulta registrada.'}</div>`;
+  go('ficha');setTimeout(()=>{const q=$('#queixaCh');if(q&&q.scrollIntoView)q.scrollIntoView({behavior:'smooth',block:'center'})},500);
+  const ele=r.sex==='f'?'ela':'ele';
+  const last=lv?(lv.diag==='saudavel'?' Da última vez estava tudo bem.':` Da última vez foi ${diagName(r,lv.diag).toLowerCase()}.`):'';
+  say(`Que bom te ver de novo, ${r.name}!${last} O que ${r.kind==='pet'?ele:'você'} está sentindo hoje?`);
+}
+
+/* ---- foto ---- */
+function takePhoto(target){S.photoTarget=target;const i=$('#photoIn');i.value='';i.click()}
+function resizeImage(file,max){return new Promise(res=>{const fr=new FileReader();fr.onload=()=>{const im=new Image();im.onload=()=>{let w=im.width,h=im.height;const k=Math.min(1,max/Math.max(w,h));w=Math.round(w*k);h=Math.round(h*k);const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(im,0,0,w,h);res(c.toDataURL('image/jpeg',.75))};im.onerror=()=>res(null);im.src=fr.result};fr.onerror=()=>res(null);fr.readAsDataURL(file)})}
+async function photoChosen(inp){
+  const f=inp.files&&inp.files[0];if(!f)return;
+  const url=await resizeImage(f,S.photoTarget==='cur'?640:420);if(!url)return;
+  if(S.photoTarget==='cur'){curSetBg(url)}else{S.form.photo=url;refreshPhoto();tada();say('Que foto linda!')}
+}
+function refreshPhoto(){
+  const ph=S.form&&S.form.photo;
+  $('#photoPrev').innerHTML=ph?`<img src="${ph}" alt="">`:'📷';
+  $('#photoDel').classList.toggle('hidden',!ph);
+}
+
+/* ---- adesivos ---- */
+const X='xmlns="http://www.w3.org/2000/svg"';
+const STICKERS={
+  estrela:`<svg ${X} viewBox="0 0 64 64"><path d="M32 6 l7.6 16 17.4 2.4 -12.6 12.2 3 17.4 L32 46 16.6 54 l3-17.4 L7 24.4 24.4 22Z" fill="#ffd43b" stroke="#e0a800" stroke-width="2"/><circle cx="27" cy="30" r="2.5" fill="#333"/><circle cx="37" cy="30" r="2.5" fill="#333"/><path d="M27 37 q5 5 10 0" stroke="#333" stroke-width="2.5" fill="none"/></svg>`,
+  coracao:`<svg ${X} viewBox="0 0 64 64"><path d="M32 56 C8 40 6 22 18 14 C26 9 32 16 32 20 C32 16 38 9 46 14 C58 22 56 40 32 56Z" fill="#ff4d6d" stroke="#c9184a" stroke-width="2"/><circle cx="22" cy="24" r="4" fill="#fff" opacity=".6"/></svg>`,
+  arcoiris:`<svg ${X} viewBox="0 0 64 64"><path d="M6 48 A26 26 0 0 1 58 48" stroke="#ff6b6b" stroke-width="6" fill="none"/><path d="M12 48 A20 20 0 0 1 52 48" stroke="#ffa94d" stroke-width="6" fill="none"/><path d="M18 48 A14 14 0 0 1 46 48" stroke="#ffd43b" stroke-width="6" fill="none"/><path d="M24 48 A8 8 0 0 1 40 48" stroke="#69db7c" stroke-width="6" fill="none"/><circle cx="8" cy="50" r="7" fill="#fff" stroke="#cdd" /><circle cx="56" cy="50" r="7" fill="#fff" stroke="#cdd"/></svg>`,
+  foguete:`<svg ${X} viewBox="0 0 64 64"><g transform="rotate(35 32 32)"><path d="M32 4 C44 16 44 36 40 46 H24 C20 36 20 16 32 4Z" fill="#e9ecef" stroke="#868e96" stroke-width="2"/><circle cx="32" cy="24" r="6" fill="#4dabf7" stroke="#1c7ed6" stroke-width="2"/><path d="M24 38 L14 48 L24 46Z M40 38 L50 48 L40 46Z" fill="#ff6b6b"/><path d="M26 46 Q32 64 38 46Z" fill="#ffa94d"/></g></svg>`,
+  pata:`<svg ${X} viewBox="0 0 64 64"><circle cx="32" cy="32" r="29" fill="#ffa94d"/><ellipse cx="32" cy="40" rx="11" ry="9" fill="#fff"/><circle cx="19" cy="27" r="5" fill="#fff"/><circle cx="27" cy="19" r="5" fill="#fff"/><circle cx="37" cy="19" r="5" fill="#fff"/><circle cx="45" cy="27" r="5" fill="#fff"/></svg>`,
+  coroa:`<svg ${X} viewBox="0 0 64 64"><path d="M8 46 L12 18 L24 32 L32 12 L40 32 L52 18 L56 46Z" fill="#ffd43b" stroke="#e0a800" stroke-width="2"/><rect x="8" y="46" width="48" height="8" rx="2" fill="#e0a800"/><circle cx="32" cy="12" r="4" fill="#ff4d6d"/><circle cx="12" cy="18" r="3" fill="#4dabf7"/><circle cx="52" cy="18" r="3" fill="#4dabf7"/></svg>`,
+  flor:`<svg ${X} viewBox="0 0 64 64">${[0,72,144,216,288].map(a=>`<circle cx="${32+15*Math.cos(a*Math.PI/180)}" cy="${30+15*Math.sin(a*Math.PI/180)}" r="11" fill="#f783ac"/>`).join('')}<circle cx="32" cy="30" r="9" fill="#ffd43b"/><path d="M32 42 V62" stroke="#40c057" stroke-width="4"/></svg>`,
+  sol:`<svg ${X} viewBox="0 0 64 64">${[0,45,90,135,180,225,270,315].map(a=>`<line x1="${32+20*Math.cos(a*Math.PI/180)}" y1="${32+20*Math.sin(a*Math.PI/180)}" x2="${32+29*Math.cos(a*Math.PI/180)}" y2="${32+29*Math.sin(a*Math.PI/180)}" stroke="#ffa94d" stroke-width="5" stroke-linecap="round"/>`).join('')}<circle cx="32" cy="32" r="16" fill="#ffd43b"/><circle cx="27" cy="30" r="2" fill="#333"/><circle cx="37" cy="30" r="2" fill="#333"/><path d="M27 36 q5 4 10 0" stroke="#333" stroke-width="2" fill="none"/></svg>`
+};
+const STKNAME={estrela:'estrela',coracao:'coração',arcoiris:'arco-íris',foguete:'foguete',pata:'patinha',coroa:'coroa',flor:'flor',sol:'sol'};
+
+/* ---- icones das ferramentas novas ---- */
+TOOLS.push(
+  {id:'oto',name:'Otoscópio',ic:`<svg viewBox="0 0 100 100"><rect x="38" y="48" width="18" height="44" rx="8" fill="#4a5568"/><path d="M30 26 h34 l-6 24 H36Z" fill="#9aa5b8" stroke="#4a5568" stroke-width="3"/><path d="M64 30 L92 22 L92 46 L64 40Z" fill="#cfd6e2" stroke="#4a5568" stroke-width="3"/><circle cx="47" cy="36" r="6" fill="#ffd43b"/><path d="M94 26 l4 -4 M95 34 h5 M94 42 l4 4" stroke="#ffd43b" stroke-width="3" stroke-linecap="round"/></svg>`},
+  {id:'vac',name:'Vacina',ic:`<svg viewBox="0 0 100 100"><g transform="rotate(-40 50 50)"><rect x="20" y="40" width="50" height="20" rx="4" fill="#fff" stroke="#556" stroke-width="3"/><rect x="24" y="44" width="34" height="12" fill="#4dabf7"/><rect x="70" y="46" width="8" height="8" fill="#778"/><path d="M78 50 H98" stroke="#556" stroke-width="3"/><rect x="4" y="47" width="18" height="6" fill="#778"/><rect x="2" y="38" width="5" height="24" rx="2" fill="#778"/></g></svg>`},
+  {id:'ultra',name:'Ultrassom',ic:`<svg viewBox="0 0 100 100"><rect x="8" y="12" width="84" height="62" rx="10" fill="#222"/><path d="M50 18 L80 66 H20Z" fill="#555"/><ellipse cx="50" cy="50" rx="12" ry="9" fill="#ccc"/><circle cx="44" cy="46" r="5" fill="#ddd"/><rect x="40" y="78" width="20" height="14" rx="4" fill="#9aa5b8"/></svg>`},
+  {id:'scale',name:'Balança e régua',ic:`<svg viewBox="0 0 100 100"><rect x="70" y="8" width="20" height="84" rx="4" fill="#ffd43b" stroke="#e0a800" stroke-width="2"/><path d="M70 20 h8 M70 32 h12 M70 44 h8 M70 56 h12 M70 68 h8 M70 80 h12" stroke="#7a5b00" stroke-width="2"/><rect x="6" y="54" width="58" height="36" rx="10" fill="#e9ecef" stroke="#868e96" stroke-width="3"/><rect x="20" y="62" width="30" height="12" rx="3" fill="#cfe8c8"/></svg>`},
+  {id:'cur',name:'Curativos',ic:`<svg viewBox="0 0 100 100"><rect x="8" y="36" width="84" height="30" rx="15" fill="#ffc9a8" transform="rotate(-30 50 50)"/><rect x="36" y="36" width="28" height="30" rx="4" fill="#fff3ea" transform="rotate(-30 50 50)"/><g fill="#e8a27f" transform="rotate(-30 50 50)"><circle cx="20" cy="46" r="2.5"/><circle cx="20" cy="56" r="2.5"/><circle cx="80" cy="46" r="2.5"/><circle cx="80" cy="56" r="2.5"/></g></svg>`}
+);
+Object.assign(TOOL_OPEN,{oto:()=>openOto(),vac:()=>openVac(),ultra:()=>openUltra(),scale:()=>openScale(),cur:()=>openCur()});
+function later(fn,ms){const t=setTimeout(fn,ms);(window._to=window._to||[]).push(t);return t}
+function clearLater(){(window._to||[]).forEach(clearTimeout);window._to=[]}
+
+/* ============ OTOSCOPIO ============ */
+const EAR_SVG=`<defs><radialGradient id="earg" cx="50%" cy="50%" r="62%"><stop offset="0" stop-color="#3a1414"/><stop offset=".33" stop-color="#a24a4a"/><stop offset=".72" stop-color="#eda39b"/><stop offset="1" stop-color="#f7c6b8"/></radialGradient></defs><rect width="200" height="200" fill="url(#earg)"/><ellipse cx="100" cy="100" rx="34" ry="30" fill="#d9c8c0"/><path d="M100 100 l16 20 -22 4Z" fill="#fff" opacity=".75"/><ellipse cx="100" cy="100" rx="34" ry="30" fill="none" stroke="#a0524f" stroke-width="3"/>`;
+function throatSVG(inf){return `<rect width="200" height="200" fill="${inf?'#c2253b':'#e98a8a'}"/><path d="M0 0 H200 V74 Q100 24 0 74Z" fill="${inf?'#e0485c':'#f4b0aa'}"/><ellipse cx="100" cy="118" rx="38" ry="44" fill="#3a0a12"/><path d="M88 52 Q100 58 112 52 Q110 92 100 96 Q90 92 88 52Z" fill="${inf?'#ff6b7f':'#f6a3a0'}"/><ellipse cx="54" cy="118" rx="17" ry="27" fill="${inf?'#ff3b4e':'#f08f8f'}"/><ellipse cx="146" cy="118" rx="17" ry="27" fill="${inf?'#ff3b4e':'#f08f8f'}"/>${inf?'<g fill="#fff8e1"><circle cx="50" cy="110" r="3"/><circle cx="58" cy="124" r="2.5"/><circle cx="150" cy="112" r="3"/><circle cx="142" cy="126" r="2.5"/></g>':''}<path d="M6 200 Q20 140 100 142 Q180 140 194 200Z" fill="#ff8fa3"/><path d="M100 150 V196" stroke="#e86b87" stroke-width="3"/>`}
+function openOto(){
+  S.otoPart='ouvido';
+  openPanel('Otoscópio',`<div class="otowrap">
+    <div class="seg" id="otoSeg"><button class="choice sel" data-v="ouvido" onclick="otoPart('ouvido')">👂 Ouvido</button><button class="choice" data-v="garganta" onclick="otoPart('garganta')">👄 Garganta</button></div>
+    <div class="otoview" id="otoview"><video id="otovid" playsinline muted autoplay class="hidden"></video><svg id="otosvg" viewBox="0 0 200 200"></svg><svg id="otofind" viewBox="0 0 200 200"></svg><div class="flash"></div></div>
+    <div class="row" style="justify-content:center"><button class="redbtn" style="margin:0" id="otobtn" onclick="runOto()">OLHAR</button>
+      <button class="camtoggle hidden" id="torchb" onclick="toggleTorch()">💡 Lanterna</button>
+      <button class="camtoggle hidden" id="otocamb" onclick="otoCam()">📷 Usar o desenho</button></div>
+    <div class="result" id="otores"></div></div>`);
+  otoPart('ouvido',true);
+  if(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia)otoCam(true);
+  say('Encoste o tablet pertinho do ouvido e aperte olhar!');
+}
+function otoPart(v,silent){
+  if(!silent)click();S.otoPart=v;setSel('#otoSeg',v);
+  $('#otosvg').innerHTML=v==='ouvido'?EAR_SVG:throatSVG(false);$('#otofind').innerHTML='';
+  $('#otores').textContent=v==='ouvido'?'Encoste o tablet pertinho do ouvido e aperte OLHAR.':'Peça para abrir bem a boca e falar AAAA!';
+  if(!silent)say(v==='garganta'?'Abre bem a boca e fala aaaaaa!':'Vamos olhar dentro do ouvido!');
+}
+async function otoCam(auto){
+  if(camStream&&!auto){stopCam();S.torch=false;$('#otoview').classList.remove('cam');$('#torchb').classList.add('hidden');$('#otocamb').textContent='📷 Usar a câmera';return}
+  const ok=await camOn('#otovid');
+  if(!$('#otoview'))return;
+  if(ok){$('#otoview').classList.add('cam');$('#otocamb').classList.remove('hidden');$('#otocamb').textContent='🖼️ Usar o desenho';
+    try{const tr=camStream.getVideoTracks()[0];const caps=tr.getCapabilities?tr.getCapabilities():{};if(caps.torch)$('#torchb').classList.remove('hidden')}catch(e){}}
+  else if(!auto){$('#otocamb').textContent='A câmera não abriu aqui';$('#otocamb').disabled=true}
+}
+function toggleTorch(force){
+  if(!camStream)return;S.torch=force===undefined?!S.torch:force;
+  try{camStream.getVideoTracks()[0].applyConstraints({advanced:[{torch:S.torch}]}).catch(()=>{})}catch(e){}
+  const b=$('#torchb');if(b)b.textContent=S.torch?'💡 Apagar lanterna':'💡 Lanterna';
+}
+function runOto(){
+  const p=S.p,part=S.otoPart,v=$('#otoview');
+  $('#otobtn').disabled=true;v.classList.add('lit');tone(1200,.05,'square',.05);
+  if(camStream&&!$('#torchb').classList.contains('hidden'))toggleTorch(true);
+  $('#otores').innerHTML='<span class="pulse">Olhando...</span>';
+  S.otoFind=S.otoFind||{};
+  if(!S.otoFind[part])S.otoFind[part]=part==='ouvido'?(p.cond==='febre'&&Math.random()<.5?'vermelho':(Math.random()<.35?'cera':'limpo')):(p.cond==='febre'?'inflamada':'saudavel');
+  const f=S.otoFind[part];
+  later(()=>{
+    if(!$('#otoview'))return;
+    v.classList.remove('lit');$('#otobtn').disabled=false;
+    let html='',txt,bad=true;
+    if(f==='cera'){html='<g fill="#c99a2e" opacity=".9"><circle cx="78" cy="122" r="11"/><circle cx="92" cy="132" r="7"/><circle cx="126" cy="84" r="9"/><circle cx="118" cy="76" r="5"/></g>';txt='Achei uma sujeirinha no ouvido! Precisa limpar.'}
+    else if(f==='vermelho'){html='<rect width="200" height="200" fill="rgba(255,0,40,.3)"/>';txt='O ouvido está vermelhinho. Por isso a febre!'}
+    else if(f==='inflamada'){html=camStream?'<rect width="200" height="200" fill="rgba(255,0,40,.3)"/>':'';if(!camStream)$('#otosvg').innerHTML=throatSVG(true);txt='A garganta está vermelha e inflamada!'}
+    else{bad=false;txt=part==='ouvido'?'O ouvido está limpinho!':'A garganta está rosadinha e saudável!'}
+    $('#otofind').innerHTML=html;
+    $('#otores').innerHTML=`<span class="${bad?'bad':'ok'}">${txt}</span>`;say(txt);
+    if(bad)oops();else{tone(880,.15,'sine',.12);tone(1320,.2,'sine',.12,.15)}
+    addNote('oto-'+part,`${part==='ouvido'?'Ouvido':'Garganta'}: <b class="${bad?'bad':'ok'}">${txt.replace(/!$/,'')}</b>`);S.done.oto=true;renderTools();
+  },1600);
+}
+
+/* ============ VACINA ============ */
+function openVac(){
+  const p=S.p;let ticks='';for(let i=0;i<7;i++)ticks+=`<path d="M${82+i*20} 40 v12" stroke="#99a" stroke-width="2"/>`;
+  openPanel('Vacina',`<div class="vacstage"><div class="vp">${pic(p,{})}</div>
+    <svg viewBox="0 0 320 120" width="380" style="max-width:100%">
+      <rect x="60" y="40" width="160" height="40" rx="6" fill="#fff" stroke="#99a" stroke-width="3"/>
+      <rect id="liquid" x="66" y="45" width="150" height="30" rx="3" fill="#4dabf7" opacity=".85"/>${ticks}
+      <rect x="220" y="54" width="20" height="12" fill="#99a"/><path d="M240 60 H314" stroke="#778" stroke-width="3"/>
+      <g id="plunger"><rect x="12" y="56" width="58" height="8" fill="#778"/><rect x="4" y="36" width="10" height="48" rx="3" fill="#778"/><rect x="62" y="44" width="8" height="32" fill="#556"/></g>
+    </svg><div class="count" id="vcount"></div></div>
+    <button class="redbtn" id="vbtn" onclick="runVac()">VACINA</button>
+    <div class="result" id="vres">Aperte o botão quando o paciente estiver pronto!</div><div id="vstk"></div>`);
+  say('Hora da vacina! Vai ser rapidinho.');
+}
+function runVac(){
+  const p=S.p,o=p.sex==='f'?'a':'o';$('#vbtn').disabled=true;$('#vres').textContent='Respira fundo...';
+  ['3','2','1'].forEach((n,i)=>later(()=>{if(!$('#vcount'))return;$('#vcount').textContent=n;tone(600+i*120,.18,'sine',.2);say(['três','dois','um'][i])},i*950));
+  later(()=>{
+    if(!$('#vcount'))return;$('#vcount').textContent='';
+    $('#plunger').style.transform='translateX(140px)';$('#liquid').style.transform='scaleX(.04)';
+    noise(.5,3000,1,.12,0,'highpass');tone(1400,.12,'square',.05,.2,1800);
+  },2900);
+  later(()=>{
+    if(!$('#vres'))return;
+    const ph=p.kind==='pet'?(p.species==='cachorro'?'Au au! Nem doeu, até abanou o rabinho!':'Miau! Ficou bravinho, mas já passou!'):pick(['Ai! Ah... nem doeu nada!','Fui muito corajos'+o+'!','Nem senti, doutora!']);
+    $('#vres').innerHTML=`<span class="ok">Vacina tomada! ${ph}</span>`;say(ph);tada();
+    $('#vstk').innerHTML=`<div class="center" style="font-size:22px;font-weight:600;margin-top:8px">Escolha o adesivo de corajoso:</div><div class="stickers">${Object.keys(STICKERS).map(k=>`<button data-k="${k}" onclick="pickSticker('${k}')">${STICKERS[k]}</button>`).join('')}</div>`;
+    addNote('vac','Vacina: <b class="ok">tomada</b>');S.done.vac=true;renderTools();
+  },4000);
+}
+function pickSticker(k){
+  S.visit.sticker=k;document.querySelectorAll('#vstk .stickers button').forEach(b=>b.classList.toggle('sel',b.dataset.k===k));
+  tada();say('Adesivo de '+STKNAME[k]+'! Parabéns pela coragem!');
+  addNote('vac',`Vacina: <b class="ok">tomada</b> • adesivo ${STICKERS[k]}`);
+}
+
+/* ============ ULTRASSOM ============ */
+function openUltra(){
+  const p=S.p,canBaby=p.sex==='f'&&(p.kind==='pet'?p.age>=1:p.age>=18);
+  openPanel('Ultrassom',`<div class="seg" id="usSeg" style="justify-content:center;margin-bottom:10px"><button class="choice sel" data-v="barriga" onclick="usMode('barriga')">Barriga</button>${canBaby?`<button class="choice" data-v="bebe" onclick="usMode('bebe')">${p.kind==='pet'?'Filhotinhos':'Bebê'}</button>`:''}</div>
+    <div class="ultra"><canvas id="uscv" width="640" height="420"></canvas></div>
+    <button class="redbtn" id="usbtn" onclick="runUltra()">LIGAR</button><div class="result" id="usres">Passe o gel geladinho na barriga e aperte LIGAR.</div>`);
+  S.usMode='barriga';usDraw(0,0);
+  say('Vamos passar o gel geladinho na barriga!');
+}
+function usMode(v){click();S.usMode=v;setSel('#usSeg',v);cancelAnimationFrame(window._raf);clearInterval(window._hb);clearLater();usDraw(0,0);$('#usbtn').disabled=false;$('#usres').textContent='Aperte LIGAR para ver.'}
+function runUltra(){
+  const p=S.p;$('#usbtn').disabled=true;noise(.6,400,2,.15,0,'bandpass',1200);
+  $('#usres').innerHTML='<span class="pulse">Procurando...</span>';
+  const mode=S.usMode;
+  if(mode==='bebe'){
+    if(!S.baby)S.baby=p.kind==='pet'?{n:2+Math.floor(Math.random()*4)}:{t:pick(['menina','menino','menina','menino','gemeas','gemeos'])};
+    window._hb=setInterval(()=>noise(.16,260,3,.35,0,'bandpass',170),420);later(()=>clearInterval(window._hb),9000);
+  }else{bellySound(p.cond==='barriga')}
+  const t0=performance.now();
+  const loop=now=>{const t=(now-t0)/1000;usDraw(t,Math.min(1,t/1.8));window._raf=requestAnimationFrame(loop)};
+  window._raf=requestAnimationFrame(loop);
+  later(()=>{
+    if(!$('#usres'))return;$('#usbtn').disabled=false;
+    let txt,bad=false;
+    if(mode==='bebe'){
+      if(p.kind==='pet')txt=`Vai ter ${S.baby.n} filhotinhos!`;
+      else txt={menina:'É uma menina!',menino:'É um menino!',gemeas:'São gêmeas! Duas meninas!',gemeos:'São gêmeos! Dois meninos!'}[S.baby.t];
+      tada();
+    }else if(p.cond==='barriga'){txt='Muitos gases! Bolhinhas por toda a barriga.';bad=true}
+    else txt='Barriga normal, tudo no lugarzinho!';
+    $('#usres').innerHTML=`<span class="${bad?'bad':'ok'}">${txt}</span>`;say(txt);
+    addNote('ultra-'+mode,`Ultrassom (${mode==='bebe'?(p.kind==='pet'?'filhotes':'bebê'):'barriga'}): <b class="${bad?'bad':'ok'}">${txt.replace(/!$/,'')}</b>`);S.done.ultra=true;renderTools();
+  },2600);
+}
+function usDraw(t,rev){
+  const c=$('#uscv');if(!c)return;const x=c.getContext('2d'),W=640,H=420,cx=320,cy=8,R=410;
+  x.fillStyle='#000';x.fillRect(0,0,W,H);
+  x.save();x.beginPath();x.moveTo(cx,cy);x.arc(cx,cy,R,Math.PI*.27,Math.PI*.73);x.closePath();x.clip();
+  const g=x.createRadialGradient(cx,cy,20,cx,cy,R);g.addColorStop(0,'#444');g.addColorStop(1,'#141414');x.fillStyle=g;x.fillRect(0,0,W,H);
+  if(rev>0){
+    x.globalAlpha=rev;try{x.filter='blur(2.5px)'}catch(e){}
+    const beat=(Math.sin(t*2*Math.PI*2.3)+1)/2;
+    if(S.usMode==='bebe'){
+      x.fillStyle='#050505';x.beginPath();x.ellipse(320,250,200,125,0,0,7);x.fill();
+      const fetus=(ox,oy,k)=>{x.fillStyle='#bdbdbd';x.beginPath();x.arc(ox-60*k,oy-8*k,46*k,0,7);x.fill();x.beginPath();x.ellipse(ox+30*k,oy+10*k,72*k,46*k,.15,0,7);x.fill();
+        x.strokeStyle='#bdbdbd';x.lineWidth=14*k;x.lineCap='round';x.beginPath();x.moveTo(ox+10*k,oy+30*k);x.quadraticCurveTo(ox-20*k,oy+70*k,ox-40*k,oy+40*k);x.stroke();
+        x.beginPath();x.moveTo(ox+80*k,oy+30*k);x.quadraticCurveTo(ox+60*k,oy+80*k,ox+20*k,oy+70*k);x.stroke();
+        x.fillStyle='#fff';x.beginPath();x.arc(ox+5*k,oy+2*k,(5+5*beat)*k,0,7);x.fill()};
+      if(S.p.kind==='pet'){const n=(S.baby&&S.baby.n)||3;for(let i=0;i<n;i++){const ox=180+i*(280/Math.max(1,n-1||1)),oy=240+(i%2?30:-20);x.fillStyle='#bdbdbd';x.beginPath();x.ellipse(ox,oy,38,28,0,0,7);x.fill();x.beginPath();x.arc(ox-30,oy-10,18,0,7);x.fill();x.fillStyle='#fff';x.beginPath();x.arc(ox,oy,3+4*beat,0,7);x.fill()}}
+      else if(S.baby&&(S.baby.t==='gemeas'||S.baby.t==='gemeos')){fetus(240,220,.62);fetus(400,290,.62)}
+      else fetus(330,245,1);
+    }else{
+      x.strokeStyle='#9e9e9e';x.lineWidth=7;
+      [[250,200,60,34],[360,190,70,30],[300,280,80,36],[420,290,50,30],[210,300,46,28]].forEach(([a,b,rx,ry])=>{x.beginPath();x.ellipse(a,b,rx,ry,.3,0,7);x.stroke()});
+      const gas=S.p.cond==='barriga';x.fillStyle='#f5f5f5';
+      for(let i=0;i<(gas?22:4);i++){const bx=180+(i*67)%300,by=380-((t*40*(1+i%3)+i*53)%260);x.beginPath();x.arc(bx,by,(gas?7:4)+(i%3)*2,0,7);x.fill()}
+    }
+    x.filter='none';x.globalAlpha=1;
+  }
+  for(let i=0;i<1300;i++){const v=Math.random()*255|0;x.fillStyle=`rgba(${v},${v},${v},${Math.random()*.32})`;x.fillRect(Math.random()*W,Math.random()*H,2,2)}
+  x.restore();
+  x.fillStyle='#8fe4ff';x.font='16px monospace';x.fillText('ULTRASSOM • '+(S.p?S.p.name.toUpperCase():''),14,24);
+  for(let i=0;i<8;i++){x.fillRect(620,40+i*45,10,2)}
+}
+
+/* ============ BALANCA E REGUA ============ */
+function openScale(){
+  const p=S.p,pet=p.kind==='pet',max=pet?100:200,step=pet?10:20;
+  let tk='';for(let cm=0;cm<=max;cm+=pet?5:10){const y=400-cm*(380/max);const big=cm%step===0;tk+=`<line x1="${big?40:50}" y1="${y}" x2="70" y2="${y}" stroke="#7a5b00" stroke-width="${big?3:1.5}"/>`;if(big)tk+=`<text x="34" y="${y+5}" font-size="14" text-anchor="end" font-family="Fredoka" font-weight="600" fill="#7a5b00">${cm}</text>`}
+  openPanel('Balança e régua',`<div class="scalewrap">
+    <svg viewBox="0 0 130 420" height="340"><rect x="40" y="10" width="34" height="396" rx="6" fill="#ffd43b" stroke="#e0a800" stroke-width="3"/>${tk}
+      <rect id="rbar" x="84" y="400" width="30" height="0" rx="6" fill="${S.doc.color}" opacity=".85"/><text id="rlab" x="99" y="396" font-size="15" text-anchor="middle" font-family="Fredoka" font-weight="700" fill="#22314a"></text></svg>
+    <svg viewBox="0 0 260 190" width="290"><rect x="10" y="50" width="240" height="120" rx="28" fill="#e9ecef" stroke="#868e96" stroke-width="5"/><rect x="30" y="120" width="200" height="34" rx="12" fill="#dee2e6"/><path d="M60 130 h140 M60 144 h140" stroke="#ced4da" stroke-width="4"/>
+      <rect x="62" y="64" width="136" height="46" rx="8" fill="#2f3b4a"/><rect x="68" y="70" width="124" height="34" rx="5" fill="#cfe8c8" id="sbg"/><text id="sdisp" x="130" y="96" font-size="26" text-anchor="middle" font-family="Courier New, monospace" font-weight="700" fill="#1b2a1b">0,0 kg</text>
+      <rect x="26" y="168" width="34" height="12" rx="4" fill="#868e96"/><rect x="200" y="168" width="34" height="12" rx="4" fill="#868e96"/></svg>
+  </div><button class="redbtn" id="scbtn" onclick="runScale()">MEDIR</button><div class="result" id="scres">Coloque o paciente na balança e encoste na régua!</div><div id="schart" class="center"></div>`);
+  say('Sobe na balança e encosta na régua!');
+}
+function nextMeasures(){
+  const r=S.rec;if(!r.base)r.base=baseMetrics(r);
+  const prev=[...r.visits].reverse().find(v=>v.h);
+  const growing=(r.kind==='pessoa'&&r.age<18)||(r.kind==='pet'&&r.age<=1);
+  if(!prev)return{h:r.base.h,w:r.base.w,prev:null};
+  return{h:prev.h+(growing?Math.round(rnd(0,3)):0),w:+Math.max(.5,prev.w+(growing?rnd(.1,.9):rnd(-.6,.6))).toFixed(1),prev};
+}
+function runScale(){
+  const p=S.p,pet=p.kind==='pet',max=pet?100:200;
+  if(!S.meas)S.meas=nextMeasures();const m=S.meas;
+  $('#scbtn').disabled=true;$('#scres').innerHTML='<span class="pulse">Medindo...</span>';$('#sbg').setAttribute('fill','#cfe8c8');
+  const t0=performance.now(),D=1900;
+  const step=now=>{const k=Math.min(1,(now-t0)/D),e=1-Math.pow(1-k,3);
+    if(!$('#rbar'))return;
+    const hh=m.h*e,px=hh*(380/max);$('#rbar').setAttribute('y',400-px);$('#rbar').setAttribute('height',px);
+    $('#rlab').setAttribute('y',396-px);$('#rlab').textContent=Math.round(hh)+' cm';
+    const jit=k<1?rnd(-1,1)*(1-k)*m.w*.2:0;$('#sdisp').textContent=fmt(Math.max(0,m.w*e+jit))+' kg';
+    if(k<1){window._raf=requestAnimationFrame(step);if(Math.random()<.15)tone(900,.03,'square',.03)}else fin()};
+  window._raf=requestAnimationFrame(step);
+  function fin(){
+    $('#scbtn').disabled=false;$('#sbg').setAttribute('fill','#c9f5d9');tone(1800,.3,'square',.07);
+    S.visit.h=m.h;S.visit.w=m.w;
+    let msg;
+    if(!m.prev)msg='Primeira medida guardada no prontuário!';
+    else if(m.h>m.prev.h)msg=`Cresceu ${m.h-m.prev.h} cm desde a última consulta!`;
+    else msg='Está do mesmo tamanho da última vez.';
+    $('#scres').innerHTML=`<span class="ok">${m.h} cm e ${fmt(m.w)} kg.</span><div style="font-size:19px;font-weight:500;margin-top:4px">${msg}</div>`;
+    say(`${m.h} centímetros e ${fmt(m.w)} quilos. ${msg}`);
+    addNote('scale',`Medidas: <b class="ok">${m.h} cm, ${fmt(m.w)} kg</b>`);S.done.scale=true;renderTools();
+    const hist=S.rec.visits.filter(v=>v.h).slice(-4).map(v=>({d:fmtDate(v.date),h:v.h})).concat([{d:'hoje',h:m.h}]);
+    if(hist.length>1){const mx=Math.max(...hist.map(z=>z.h))*1.15,bw=50,gap=24,W=hist.length*(bw+gap)+gap;
+      $('#schart').innerHTML=`<div style="font-weight:600;margin-top:8px">Como ${p.name} cresceu</div><svg viewBox="0 0 ${W} 170" width="${Math.min(W*1.2,500)}" style="max-width:100%">${hist.map((z,i)=>{const hh=z.h/mx*120,xx=gap+i*(bw+gap);return `<rect x="${xx}" y="${140-hh}" width="${bw}" height="${hh}" rx="8" fill="${i===hist.length-1?S.doc.color:'#c5d0e0'}"/><text x="${xx+bw/2}" y="${134-hh}" font-size="14" text-anchor="middle" font-family="Fredoka" font-weight="700" fill="#22314a">${z.h}</text><text x="${xx+bw/2}" y="160" font-size="13" text-anchor="middle" font-family="Fredoka" fill="#22314a">${z.d}</text>`}).join('')}</svg>`}
+  }
+}
+
+/* ============ CURATIVOS ============ */
+const CURS={
+  bege:{a:.4,svg:`<svg ${X} viewBox="0 0 100 40"><rect x="1" y="1" width="98" height="38" rx="19" fill="#f2c29b" stroke="#d9a47c" stroke-width="2"/><rect x="34" y="6" width="32" height="28" rx="5" fill="#fbe3cf"/><g fill="#d9a47c"><circle cx="14" cy="14" r="2"/><circle cx="14" cy="26" r="2"/><circle cx="24" cy="20" r="2"/><circle cx="86" cy="14" r="2"/><circle cx="86" cy="26" r="2"/><circle cx="76" cy="20" r="2"/></g></svg>`},
+  rosa:{a:.4,svg:`<svg ${X} viewBox="0 0 100 40"><rect x="1" y="1" width="98" height="38" rx="19" fill="#ff8fb8" stroke="#e8669a" stroke-width="2"/><rect x="34" y="6" width="32" height="28" rx="5" fill="#ffe0ec"/><path d="M15 16 c-3 -4 -8 0 -4 4 l4 4 4-4 c4-4 -1-8 -4-4Z M85 16 c-3 -4 -8 0 -4 4 l4 4 4-4 c4-4 -1-8 -4-4Z" fill="#fff"/></svg>`},
+  azul:{a:.4,svg:`<svg ${X} viewBox="0 0 100 40"><rect x="1" y="1" width="98" height="38" rx="19" fill="#74c0fc" stroke="#4dabf7" stroke-width="2"/><rect x="34" y="6" width="32" height="28" rx="5" fill="#e7f5ff"/><path d="M16 12 l2 5 5 .5 -4 3 1.5 5 -4.5 -3 -4.5 3 1.5 -5 -4 -3 5 -.5Z M84 12 l2 5 5 .5 -4 3 1.5 5 -4.5 -3 -4.5 3 1.5 -5 -4 -3 5 -.5Z" fill="#ffd43b"/></svg>`},
+  gesso:{a:.5,svg:`<svg ${X} viewBox="0 0 100 50"><rect x="2" y="2" width="96" height="46" rx="12" fill="#fafafa" stroke="#ced4da" stroke-width="3"/><path d="M14 4 v42 M30 4 v42 M46 4 v42 M62 4 v42 M78 4 v42" stroke="#e9ecef" stroke-width="3"/><path d="M50 32 c-6 -8 -16 0 -8 8 l8 6 8-6 c8-8 -2-16 -8-8Z" fill="#ff6b9a"/><text x="22" y="22" font-size="11" font-family="Fredoka" fill="#7c5cff">sara logo!</text></svg>`},
+  tipoia:{a:.75,svg:`<svg ${X} viewBox="0 0 100 75"><path d="M6 4 L94 4 L50 72Z" fill="#4c6ef5" stroke="#364fc7" stroke-width="3" stroke-linejoin="round"/><path d="M20 12 L80 12" stroke="#91a7ff" stroke-width="3" stroke-dasharray="6 5"/><circle cx="50" cy="64" r="5" fill="#ffd43b"/></svg>`},
+  gelo:{a:.8,svg:`<svg ${X} viewBox="0 0 100 80"><rect x="38" y="2" width="24" height="14" rx="4" fill="#868e96"/><path d="M30 16 h40 c14 10 22 30 16 46 c-6 16 -66 16 -72 0 c-6 -16 2 -36 16 -46Z" fill="#74c0fc" stroke="#339af0" stroke-width="3"/><rect x="34" y="34" width="12" height="12" rx="2" fill="#e7f5ff" transform="rotate(15 40 40)"/><rect x="54" y="44" width="12" height="12" rx="2" fill="#e7f5ff" transform="rotate(-10 60 50)"/></svg>`},
+  coracao:{a:.9,svg:`<svg ${X} viewBox="0 0 100 90"><path d="M50 86 C10 60 4 30 22 14 C36 2 50 14 50 24 C50 14 64 2 78 14 C96 30 90 60 50 86Z" fill="#ff8fb8" stroke="#e8669a" stroke-width="3"/><path d="M50 66 C30 52 30 36 40 32 C46 30 50 36 50 40 C50 36 54 30 60 32 C70 36 70 52 50 66Z" fill="#ffe0ec"/></svg>`}
+};
+function openCur(){
+  S.cur={items:[],bg:S.p.photo||null,sel:-1};
+  openPanel('Curativos',`<div class="cstage" id="cstage"></div>
+    <div class="palette">${Object.keys(CURS).map(k=>`<button onclick="curAdd('${k}')" aria-label="${k}">${CURS[k].svg}</button>`).join('')}</div>
+    <div class="ctrls"><button onclick="takePhoto('cur')">📷 Foto do machucado</button><button onclick="curMod(1.2,0)">Maior</button><button onclick="curMod(.83,0)">Menor</button><button onclick="curMod(1,30)">Girar</button><button onclick="curDel()">Tirar</button></div>
+    <div class="actions" style="margin-top:12px"><button class="big" onclick="curSave()">Pronto!</button></div><div class="result" id="cres">Toque num curativo e arraste até o machucado.</div>`);
+  curRender();
+  const st=$('#cstage');
+  st.addEventListener('pointerdown',e=>{
+    const el=e.target.closest('.stk-item');
+    if(!el){S.cur.sel=-1;curRender();return}
+    const i=+el.dataset.i;S.cur.sel=i;document.querySelectorAll('.stk-item').forEach(n=>n.classList.toggle('sel',n===el));
+    try{st.setPointerCapture(e.pointerId)}catch(_){}
+    S.cur.drag={i,el};e.preventDefault();
+  });
+  st.addEventListener('pointermove',e=>{
+    const d=S.cur.drag;if(!d)return;const r=st.getBoundingClientRect();
+    const it=S.cur.items[d.i];it.x=Math.max(0,Math.min(100,(e.clientX-r.left)/r.width*100));it.y=Math.max(0,Math.min(100,(e.clientY-r.top)/r.height*100));
+    d.el.style.left=it.x+'%';d.el.style.top=it.y+'%';
+  });
+  const end=()=>{S.cur.drag=null};st.addEventListener('pointerup',end);st.addEventListener('pointercancel',end);
+  say('Escolha um curativo e arraste até o machucado!');
+}
+function curRender(){
+  const st=$('#cstage');if(!st)return;const c=S.cur;
+  st.innerHTML=(c.bg?`<img class="bg" src="${c.bg}" alt="">`:`<div class="bgsvg">${avatar(S.p,{sad:true})}</div>`)+
+    c.items.map((it,i)=>`<div class="stk-item ${i===c.sel?'sel':''}" data-i="${i}" style="left:${it.x}%;top:${it.y}%;width:${22*it.s}%;transform:translate(-50%,-50%) rotate(${it.r}deg)">${CURS[it.k].svg}</div>`).join('');
+}
+function curAdd(k){S.cur.items.push({k,x:50+rnd(-8,8),y:50+rnd(-8,8),s:1,r:0});S.cur.sel=S.cur.items.length-1;noise(.25,2500,1,.08,0,'highpass',6000);curRender()}
+function curMod(f,dr){const it=S.cur.items[S.cur.sel];if(!it){oops();return}it.s=Math.max(.4,Math.min(3,it.s*f));it.r=(it.r+dr)%360;click();curRender()}
+function curDel(){if(S.cur.sel<0){oops();return}S.cur.items.splice(S.cur.sel,1);S.cur.sel=-1;click();curRender()}
+function curSetBg(url){S.cur.bg=url;curRender();tada()}
+const loadImg=src=>new Promise(res=>{const i=new Image();i.onload=()=>res(i);i.onerror=()=>res(null);i.src=src});
+const svgUrl=s=>'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(s);
+async function curSave(){
+  const c=S.cur;if(!c.items.length){oops();$('#cres').textContent='Coloque pelo menos um curativo!';say('Coloque pelo menos um curativo!');return}
+  const W=640,H=480,cv=document.createElement('canvas');cv.width=W;cv.height=H;const x=cv.getContext('2d');
+  x.fillStyle=S.doc.light;x.fillRect(0,0,W,H);
+  if(c.bg){const im=await loadImg(c.bg);if(im){const k=Math.max(W/im.width,H/im.height),w=im.width*k,h=im.height*k;x.drawImage(im,(W-w)/2,(H-h)/2,w,h)}}
+  else{const sv=avatar(S.p,{sad:true}),asp=S.p.kind==='pessoa'?200/270:300/230;const im=await loadImg(svgUrl(sv));if(im){const h=H,w=h*asp;x.drawImage(im,(W-w)/2,0,w,h)}}
+  for(const it of c.items){const im=await loadImg(svgUrl(CURS[it.k].svg));if(!im)continue;const w=W*.22*it.s,h=w*CURS[it.k].a;x.save();x.translate(it.x/100*W,it.y/100*H);x.rotate(it.r*Math.PI/180);x.drawImage(im,-w/2,-h/2,w,h);x.restore()}
+  let url;try{url=cv.toDataURL('image/jpeg',.72)}catch(e){url=null}
+  if(url)S.visit.curPhoto=url;
+  tada();say('Curativo feito! Vai sarar rapidinho.');
+  addNote('cur',`Curativo: <b class="ok">feito</b>${url?` <img src="${url}" alt="" style="width:90px;border-radius:8px;vertical-align:middle">`:''}`);S.done.cur=true;renderTools();
+  $('#cres').innerHTML='<span class="ok">Curativo guardado no prontuário!</span>';
+}
+
+/* ============ SALA DE ESPERA ============ */
+S.queue=[];S.called=null;
+function openEspera(){click();renderEspera();go('espera');say('Sala de espera! Quem chegou para a consulta?')}
+function renderEspera(){
+  $('#eChips').innerHTML=DB.patients.length?DB.patients.map(p=>`<button onclick="addQueue('${p.id}')">${esc(p.name)}</button>`).join(''):'<span style="opacity:.6">Os pacientes já atendidos aparecem aqui.</span>';
+  $('#eQueue').innerHTML=S.queue.length?S.queue.map(q=>`<li><span class="qp">${q.id&&recById(q.id)?pic(recById(q.id)):'🙂'}</span><b>${String(q.senha).padStart(3,'0')}</b>&nbsp;${esc(q.name)}</li>`).join(''):'<li class="empty">Ninguém esperando ainda.</li>';
+}
+function nextSenha(){DB.senha=(DB.senha||0)+1;saveDB();return DB.senha}
+function addQueue(id){const r=recById(id);if(!r||S.queue.some(q=>q.id===id)){oops();return}S.queue.push({id,name:r.name,senha:nextSenha()});click();say(r.name+' chegou!');renderEspera()}
+function addQueueNew(){const n=$('#eName').value.trim();if(!n){$('#eName').classList.add('shake');setTimeout(()=>$('#eName').classList.remove('shake'),400);return}
+  S.queue.push({id:null,name:n,senha:nextSenha()});$('#eName').value='';click();say(n+' chegou!');renderEspera()}
+function callNext(doc){
+  if(!S.queue.length){oops();say('Não tem ninguém esperando.');return}
+  const q=S.queue.shift();S.called={...q,doc};
+  $('#pSenha').textContent=String(q.senha).padStart(3,'0');$('#pNm').textContent=q.name;$('#pDc').textContent='Consultório da '+DOCS[doc].name;
+  const pn=$('#painel');pn.classList.remove('flash');void pn.offsetWidth;pn.classList.add('flash');
+  tone(659,.6,'sine',.25);tone(523,.9,'sine',.25,.5);
+  setTimeout(()=>say(`Senha ${q.senha}. ${q.name}, por favor, consultório da ${DOCS[doc].name.replace('Dra.','Doutora')}.`),1200);
+  const ab=$('#atenderBtn');ab.classList.remove('hidden');ab.style.background=DOCS[doc].color;
+  renderEspera();
+}
+function atender(){const c=S.called;if(!c)return;setDoctor(c.doc);S.called=null;$('#atenderBtn').classList.add('hidden');
+  if(c.id&&recById(c.id))openPatient(c.id);else newPatient(c.name)}
+
+/* ============ AMBULANCIA ============ */
+function openAmb(){$('#amb').classList.add('on');siren();setTimeout(()=>say('Emergência! A ambulância está chegando!'),600)}
+function siren(){stopSiren();const a=ac();if(!a)return;const o=a.createOscillator(),g=a.createGain();o.type='triangle';g.gain.value=.16;
+  for(let i=0;i<80;i++)o.frequency.setValueAtTime(i%2?960:720,a.currentTime+i*.45);
+  o.connect(g).connect(a.destination);o.start();o.stop(a.currentTime+36);S.sirenO=o}
+function stopSiren(){try{if(S.sirenO)S.sirenO.stop()}catch(e){}S.sirenO=null}
+function closeAmb(attend){
+  $('#amb').classList.remove('on');stopSiren();try{speechSynthesis.cancel()}catch(e){}
+  if(!attend)return;
+  if(!S.doc){go('home');say('Escolha a doutora que vai atender a emergência!');return}
+  closeTool();newPatient();$('#fichaTitle').textContent='Emergência! '+S.doc.name;say('Rápido! Quem é o paciente?');
+}
+function printRx(){try{window.print()}catch(e){}}
 
 /* ============ CONFETE ============ */
 function confetti(){
@@ -1023,6 +1568,7 @@ $('#icoPessoa').innerHTML=personSVG({sex:'f',age:8,look:{skin:'#f9d3b4',hair:'#6
 $('#icoPet').innerHTML=petSVG({species:'cachorro',sex:'m',age:3,look:{fur:'#c8874a'}});
 $('#icoDog').innerHTML=petSVG({species:'cachorro',sex:'f',age:3,look:{fur:'#f1d3a1'}});
 $('#icoCat').innerHTML=petSVG({species:'gato',sex:'m',age:3,look:{fur:'#f39c3d'}});
+$('#eName').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addQueueNew()}});
 $('#pName').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('#pName').blur()}});
 if('speechSynthesis' in window){try{speechSynthesis.getVoices();speechSynthesis.onvoiceschanged=()=>{}}catch(e){}}
 renderHome();
