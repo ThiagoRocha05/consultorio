@@ -95,7 +95,9 @@ input{font-family:inherit}
 
 /* OVERLAY */
 #overlay{position:fixed;inset:0;background:rgba(20,25,45,.6);display:none;z-index:50;padding:16px;overflow:auto}
-#overlay.on{display:grid;place-items:center}
+#overlay.on{display:grid;place-items:start center}
+#overlay .panel{margin:auto}
+.panel .ph{position:sticky;top:-16px;background:#fff;z-index:3;padding-top:4px}
 .panel{background:#fff;border-radius:30px;width:min(980px,100%);padding:16px 18px 20px;position:relative;animation:pop .3s}
 .panel .ph{display:flex;align-items:center;gap:12px;margin-bottom:10px}
 .panel .ph h2{flex:1;margin:0;font-size:clamp(22px,3vw,30px)}
@@ -106,7 +108,7 @@ input{font-family:inherit}
 /* XRAY */
 .xray{background:radial-gradient(ellipse at center,#12324a,#050d16 75%);border-radius:24px;position:relative;overflow:hidden;display:flex;justify-content:center;padding:10px}
 .xray:before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(80,200,255,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(80,200,255,.07) 1px,transparent 1px);background-size:28px 28px;pointer-events:none}
-.xray svg{height:min(56vh,520px);max-width:100%;position:relative}
+.xray svg{height:min(50vh,500px);max-width:100%;position:relative}
 .xray.cam{min-height:min(56vh,520px)}
 .xray .bn{fill:#e9fbff;stroke:#bdf1ff;stroke-width:1}
 .xray .rib{fill:none;stroke:#e9fbff;stroke-width:4;stroke-linecap:round}
@@ -279,6 +281,27 @@ input{font-family:inherit}
 }
 
 .camview .face .pphoto{height:100%;width:auto}
+
+.spgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.spgrid .choice{min-width:0}
+.spgrid .choice svg{width:96px;height:80px}
+.camico{font-size:52px;line-height:80px;height:80px}
+.opt .emo{display:block;font-size:56px;line-height:1.2;margin-bottom:4px}
+.retb{position:absolute;top:8px;left:8px;background:#ffd43b;color:#5a4300;border-radius:10px;padding:3px 8px;font-size:14px;font-weight:700}
+.heatbar{display:flex;align-items:center;gap:10px;justify-content:center;margin-top:10px;font-size:26px}
+.heatbar .hb{width:min(60vw,380px);height:18px;border-radius:9px;background:linear-gradient(90deg,#a5d8ff,#ff8787);position:relative;overflow:hidden}
+.heatbar .hb div{position:absolute;left:0;top:0;bottom:0;background:rgba(255,255,255,.0);border-right:6px solid #22314a;width:0;transition:width .1s}
+.tprog{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:10px}
+.tdot{background:#fff;border-radius:14px;padding:6px 12px;font-size:16px;font-weight:600;opacity:.6}
+.tdot.now{opacity:1;background:var(--doc);color:#fff}
+.tdot.ok{opacity:1;background:#d3f9d8;color:#2b8a3e}
+.tbox{max-width:900px;margin:0 auto;text-align:center}
+.tinst{font-size:clamp(19px,2.6vw,26px);font-weight:600;margin:4px 0 10px}
+#tstage{display:block;width:min(100%,calc(60vh*4/3));aspect-ratio:4/3;margin:0 auto;background:#fff;border-radius:24px;touch-action:none;box-shadow:0 8px 0 rgba(0,0,0,.06)}
+.tmsg{min-height:34px;font-size:22px;font-weight:600;margin-top:8px}.tmsg .ok{color:var(--ok)}
+.tctrl{margin-top:8px}
+.popout{animation:popout .3s forwards;transform-box:fill-box;transform-origin:center}
+@keyframes popout{to{transform:scale(1.8);opacity:0}}
 </style>
 </head>
 <body>
@@ -320,17 +343,7 @@ input{font-family:inherit}
   <div class="paper">
     <div id="backBanner" class="back-banner hidden"></div>
     <div class="label">Quem é o paciente?</div>
-    <div class="choices" id="kindCh">
-      <button class="choice" data-v="pessoa" onclick="setKind('pessoa')"><span id="icoPessoa"></span>Pessoa</button>
-      <button class="choice" data-v="pet" onclick="setKind('pet')"><span id="icoPet"></span>Bichinho</button>
-    </div>
-    <div id="speciesBox" class="hidden">
-      <div class="label">Que bichinho?</div>
-      <div class="choices" id="specCh">
-        <button class="choice" data-v="cachorro" onclick="setSpecies('cachorro')"><span id="icoDog"></span>Cachorro</button>
-        <button class="choice" data-v="gato" onclick="setSpecies('gato')"><span id="icoCat"></span>Gato</button>
-      </div>
-    </div>
+    <div class="choices spgrid" id="specCh"></div>
     <div id="restBox" class="hidden">
       <div class="label" id="sexLabel">É menina ou menino?</div>
       <div class="choices" id="sexCh">
@@ -351,8 +364,6 @@ input{font-family:inherit}
         <button onclick="stepAge(1)">+</button>
         <span id="ageUnit" style="font-size:24px;font-weight:600">anos</span>
       </div>
-      <div class="label">O que o paciente está sentindo?</div>
-      <div class="choices" id="queixaCh"></div>
       <div class="actions"><button class="big" onclick="startConsult()">Começar a consulta</button></div>
     </div>
   </div>
@@ -384,12 +395,14 @@ input{font-family:inherit}
   <div class="msg hidden" id="diagMsg"></div>
 </section>
 
-<!-- PRESCRICAO -->
-<section id="rx" class="screen">
-  <div class="topbar"><button class="iconbtn" onclick="go('diag')" aria-label="Voltar">←</button><h2 id="rxTitle">Escolha os remédios</h2><button class="iconbtn sndbtn" onclick="toggleSound()">🔊</button></div>
-  <div class="grid" id="rxGrid"></div>
-  <div class="msg hidden" id="rxMsg"></div>
-  <div class="actions"><button class="big" onclick="signRx()">Assinar a receita</button></div>
+<!-- TRATAMENTO -->
+<section id="trat" class="screen">
+  <div class="topbar"><button class="iconbtn" onclick="go('consulta')" aria-label="Voltar">←</button><h2 id="tTitle">Tratamento</h2><button class="iconbtn sndbtn" onclick="toggleSound()">🔊</button></div>
+  <div class="tprog" id="tProg"></div>
+  <div class="tbox"><div class="tinst" id="tInst"></div>
+    <svg id="tstage" viewBox="0 0 400 300"></svg>
+    <div class="tmsg" id="tMsg"></div>
+    <div class="tctrl" id="tCtrl"></div></div>
 </section>
 
 <!-- RECEITA -->
@@ -428,7 +441,7 @@ const fmt=n=>n.toFixed(1).replace('.',',');
 function store(){try{return JSON.parse(localStorage.getItem('consultorio-contagem')||'{}')}catch(e){return {}}}
 function bump(id){try{const c=store();c[id]=(c[id]||0)+1;localStorage.setItem('consultorio-contagem',JSON.stringify(c))}catch(e){}}
 
-function go(id){
+function go(id){cancelAnimationFrame(window._raf);clearInterval(window._hold);
   document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active',s.id===id));
   window.scrollTo(0,0);
   if(id==='home')renderHome();
@@ -446,9 +459,9 @@ function noiseBuf(a){if(_nb&&_nb.sampleRate===a.sampleRate)return _nb;const n=a.
 function noise(dur,freq,q,vol,t0=0,type='lowpass',f2){const a=ac();if(!a)return;const src=a.createBufferSource();src.buffer=noiseBuf(a);src.loop=true;const fl=a.createBiquadFilter();fl.type=type;const t=a.currentTime+t0;fl.frequency.setValueAtTime(freq,t);if(f2)fl.frequency.exponentialRampToValueAtTime(f2,t+dur);fl.Q.value=q;const g=a.createGain();g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+Math.min(.02,dur/4));g.gain.exponentialRampToValueAtTime(.0001,t+dur);src.connect(fl).connect(g).connect(out(a));src.start(t);src.stop(t+dur+.05);live.push(src)}
 function stethoNoise(d){noise(d,300,.7,.05,0)}
 function thump(t0,f1,f2,dur,vol){tone(f1,dur,'sine',vol*.55,t0,f2);tone(f1*2.4,dur*.85,'triangle',vol*.45,t0,f2*2.4);tone(f1*4,dur*.5,'sine',vol*.18,t0,f2*4);noise(dur,260,1.4,vol*1.6,t0,'bandpass',150)}
-function heartBeat(){thump(0,62,40,.14,.6);thump(.18,80,52,.11,.45)}
+function heartBeat(v=1){thump(0,62,40,.14,.6*v);thump(.18,80,52,.11,.45*v)}
 function bellySound(sick){
-  const n=sick?14:3;let t=0;
+  const n=sick===true?14:sick==='leve'?7:3;let t=0;sick=!!sick;
   for(let i=0;i<n;i++){
     const f=rnd(sick?120:160,sick?420:300),d=rnd(.08,.25);
     const a=ac();if(!a)return;const o=a.createOscillator(),lfo=a.createOscillator(),lg=a.createGain(),g=a.createGain(),fl=a.createBiquadFilter();
@@ -726,52 +739,6 @@ const IC={
   happy:c=>`<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="24" fill="${c}"/><circle cx="24" cy="28" r="3" fill="#333"/><circle cx="40" cy="28" r="3" fill="#333"/><path d="M22 38 q10 10 20 0" stroke="#333" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M44 48 l5 5 9 -11" stroke="#21b26b" stroke-width="4" fill="none"/></svg>`,
 };
 
-/* ============ DADOS CLINICOS ============ */
-const DIAGS={
-  pessoa:[
-    {id:'febre',name:'Gripe com febre',ic:IC.thermo('#ff4d5e')},
-    {id:'fratura',name:'Osso quebrado',ic:IC.broken('#ff4d5e')},
-    {id:'pressao',name:'Pressão alta',ic:IC.gauge('#ff4d5e'),min30:true},
-    {id:'barriga',name:'Dor de barriga',ic:IC.tummy('#8a5cf6')},
-    {id:'saudavel',name:'Está tudo bem!',ic:IC.happy('#ffd43b')}],
-  pet:[
-    {id:'febre',name:'Febre',ic:IC.thermo('#ff4d5e')},
-    {id:'fratura',name:'Patinha quebrada',ic:IC.broken('#ff4d5e')},
-    {id:'barriga',name:'Dor de barriga',ic:IC.tummy('#8a5cf6')},
-    {id:'saudavel',name:'Saudável, só vacina',ic:IC.happy('#ffd43b')}]
-};
-const MEDS={
-  pessoa:[
-    {id:'xarope',name:'Xarope da febre',ic:IC.bottle('#ff6b6b'),txt:'Tomar quando a febre aparecer, sempre com um adulto ajudando.'},
-    {id:'agua',name:'Água e descanso',ic:IC.cup('#4dabf7'),txt:'Beber água várias vezes e descansar bastante.'},
-    {id:'gesso',name:'Gesso e tipoia',ic:IC.cast('#ffffff'),txt:'Ficar com o gesso até o osso colar de novo.'},
-    {id:'dor',name:'Remedinho para dor',ic:IC.pill('#ffd43b'),txt:'Tomar se doer, sempre com um adulto ajudando.'},
-    {id:'pressaoMed',name:'Remédio da pressão',ic:IC.pill('#4c6ef5'),txt:'Tomar todo dia de manhã, sem esquecer.'},
-    {id:'sal',name:'Comer menos sal',ic:IC.salt(),txt:'Comida com pouco sal e bastante fruta e verdura.'},
-    {id:'cha',name:'Chazinho da barriga',ic:IC.cup('#69db7c'),txt:'Tomar morninho e comer comida bem levinha.'},
-    {id:'vitamina',name:'Vitaminas',ic:IC.pill('#ffa94d'),txt:'Comer frutas coloridas todos os dias.'},
-    {id:'curativo',name:'Curativo',ic:IC.bandage('#ffc9a8'),txt:'Trocar quando molhar.'},
-    {id:'adesivo',name:'Adesivo de paciente corajoso',ic:IC.star('#ffd43b'),txt:'Colar na roupa e mostrar para todo mundo!'}],
-  pet:[
-    {id:'pfebre',name:'Remédio da febre de bichinho',ic:IC.bottle('#b197fc'),txt:'Dar junto com a comidinha, como a doutora mandou.'},
-    {id:'pagua',name:'Água fresquinha e descanso',ic:IC.bowl('#a5d8ff'),txt:'Deixar o pote sempre cheio e a caminha quentinha.'},
-    {id:'tala',name:'Tala na patinha',ic:IC.cast('#ffffff'),txt:'Nada de pular do sofá até sarar!'},
-    {id:'pdor',name:'Remedinho para dor de bichinho',ic:IC.pill('#ffd43b'),txt:'Dar se doer, como a doutora mandou.'},
-    {id:'pbarriga',name:'Remédio da barriga',ic:IC.bottle('#69db7c'),txt:'Dar de manhã e de noite.'},
-    {id:'racao',name:'Ração levinha',ic:IC.bowl('#c8874a'),txt:'Só ração levinha por uns dias, nada de comer coisa do chão.'},
-    {id:'vacina',name:'Vacina',ic:IC.syringe('#4dabf7'),txt:'Picadinha rápida, e pronto: protegido o ano todo!'},
-    {id:'banho',name:'Banho cheiroso',ic:IC.bubbles('#74c0fc'),txt:'Banho com água morna e muito carinho.'},
-    {id:'petisco',name:'Petisco de prêmio',ic:IC.bonetreat('#e8c39e'),txt:'Um petisco por ter sido muito corajoso!'}]
-};
-const CURE={
-  pessoa:{febre:['xarope','agua'],fratura:['gesso','dor'],pressao:['pressaoMed','sal'],barriga:['cha','agua'],saudavel:['vitamina','adesivo']},
-  pet:{febre:['pfebre','pagua'],fratura:['tala','pdor'],barriga:['pbarriga','racao'],saudavel:['vacina','petisco']}
-};
-const BONUS={pessoa:['adesivo'],pet:['petisco']};
-const HINTS={febre:'Que tal medir a temperatura com o termômetro?',fratura:'Que tal tirar um raio-x?',pressao:'Que tal medir a pressão?',barriga:'Que tal escutar a barriga com o estetoscópio?',saudavel:'Os exames deram tudo normal... talvez esteja tudo bem!'};
-const NAMES={pessoa:{f:['Ana','Laura','Sofia','Júlia','Alice','Manuela','Vovó Rosa','Tia Bia'],m:['Pedro','Lucas','Davi','Miguel','Vovô Zé','Tio Caio','Gabriel','Arthur']},
-  cachorro:{f:['Mel','Pipoca','Luna','Pérola','Nina'],m:['Rex','Thor','Bob','Paçoca','Max']},gato:{f:['Mimi','Frajola','Luna','Nala','Bolinha'],m:['Tom','Garfield','Simba','Fumaça','Félix']}};
-
 /* ============ HOME ============ */
 function renderHome(){
   const c=store();
@@ -787,216 +754,874 @@ function pickDoctor(id){
   showPacientes();
 }
 
+/* ============ ESPECIES ============ */
+const SPECIES={
+  pessoa:{label:'Pessoa',kind:'pessoa',max:110,def:8},
+  cachorro:{label:'Cachorro',kind:'pet',voice:'Au au!',max:25,def:3},
+  gato:{label:'Gato',kind:'pet',voice:'Miau!',max:25,def:3},
+  capivara:{label:'Capivara',kind:'pet',voice:'Iiic iiic!',max:15,def:2},
+  galinha:{label:'Galinha',kind:'pet',voice:'Có có có!',max:10,def:2},
+  ursinho:{label:'Ursinho',kind:'pelucia',max:20,def:2},
+  personagem:{label:'Pelúcia ou boneco',kind:'pelucia',max:20,def:2}
+};
+const spOf=p=>p.species||(p.kind==='pessoa'?'pessoa':'cachorro');
+const kindOf=sp=>SPECIES[sp].kind;
+const CAPIC=['#8d6a48','#9c7a54','#7a5a3c'];
+const HENC=['#ffffff','#c8763a','#f2e2c4','#3b3b3b'];
+const BEARC=['#b07a4a','#d9a066','#f2b8c6','#f5f0e6','#8fb3e8'];
+const PLUSHC=['#9ad0ff','#c3a6ff','#ffb3c6','#a8e6a1','#ffd98a'];
+
+/* ---- desenhos novos (viewBox 300x230) ---- */
+function capiSVG(p,opts={}){
+  const c=p.look.fur,dk=shade(c),pup=p.age<=1;
+  let s=`<svg viewBox="0 0 300 230" xmlns="http://www.w3.org/2000/svg"><g ${pup?'transform="translate(150 225) scale(.85) translate(-150 -225)"':''}>`;
+  s+=`<ellipse cx="160" cy="216" rx="112" ry="9" fill="rgba(0,0,0,.08)"/>`;
+  [120,224].forEach(x=>s+=`<rect x="${x+14}" y="150" width="24" height="56" rx="11" fill="${dk}"/>`);
+  s+=`<path d="M70 120 C70 70 130 62 180 64 C240 66 268 96 266 138 C264 178 226 190 170 190 C110 190 70 176 70 120Z" fill="${c}"/>`;
+  s+=`<path d="M100 150 C140 170 210 170 250 146" stroke="${dk}" stroke-width="4" fill="none" opacity=".35"/>`;
+  [112,216].forEach(x=>s+=`<rect x="${x-12}" y="156" width="26" height="52" rx="12" fill="${c}"/><ellipse cx="${x+1}" cy="207" rx="17" ry="8" fill="${dk}"/>`);
+  s+=`<path d="M30 92 C28 66 54 52 82 52 C112 52 128 72 126 100 C124 126 104 138 80 138 C50 138 32 120 30 92Z" fill="${c}"/>`;
+  s+=`<ellipse cx="96" cy="50" rx="11" ry="9" fill="${dk}"/><ellipse cx="64" cy="54" rx="10" ry="8" fill="${dk}"/>`;
+  s+=`<path d="M30 96 C30 120 46 136 70 136 C54 128 40 116 36 96Z" fill="${dk}" opacity=".35"/>`;
+  s+=`<ellipse cx="40" cy="96" rx="5" ry="3" fill="#3a2a1a"/><ellipse cx="52" cy="97" rx="5" ry="3" fill="#3a2a1a"/>`;
+  s+=`<circle cx="74" cy="78" r="6" fill="#2a2a3a"/><circle cx="104" cy="78" r="6" fill="#2a2a3a"/><circle cx="76" cy="76" r="2" fill="#fff"/><circle cx="106" cy="76" r="2" fill="#fff"/>`;
+  s+= opts.sad?`<path d="M36 114 q12 -6 22 0" stroke="#3a2a1a" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M66 68 l12 4 M112 68 l-12 4" stroke="#3a2a1a" stroke-width="3" stroke-linecap="round"/>`
+    :`<path d="M36 110 q12 8 22 0" stroke="#3a2a1a" stroke-width="3" fill="none" stroke-linecap="round"/>`;
+  s+= p.sex==='f'?`<g transform="translate(92 42)"><path d="M0 0 L-14 -8 L-14 8Z M0 0 L14 -8 L14 8Z" fill="#ff5c9a"/><circle r="5" fill="#ff2d7a"/></g>`:`<path d="M96 132 Q110 142 124 132" stroke="#3d7bff" stroke-width="7" fill="none"/>`;
+  return s+`</g></svg>`;
+}
+function chickSVG(p,opts={}){
+  const c=p.look.fur,dk=shade(c),galo=p.sex==='m',pup=p.age<=0;
+  let s=`<svg viewBox="0 0 300 230" xmlns="http://www.w3.org/2000/svg"><g>`;
+  s+=`<ellipse cx="150" cy="218" rx="80" ry="8" fill="rgba(0,0,0,.08)"/>`;
+  s+=`<path d="M138 170 v38 M126 210 h24 M162 170 v38 M150 210 h24" stroke="#f2a33a" stroke-width="7" stroke-linecap="round"/>`;
+  s+= galo?`<path d="M210 120 C250 70 270 80 262 120 C280 100 284 140 250 150Z" fill="#2f9e44"/><path d="M214 126 C244 96 262 110 250 140Z" fill="#e8590c"/>`
+    :`<path d="M214 118 C244 92 258 104 248 136Z" fill="${dk}"/>`;
+  s+=`<ellipse cx="160" cy="132" rx="70" ry="52" fill="${c}" stroke="${dk}" stroke-width="2"/>`;
+  s+=`<path d="M130 120 C150 150 190 150 206 128 C196 160 150 168 130 120Z" fill="${dk}" opacity=".45"/>`;
+  s+=`<circle cx="104" cy="84" r="36" fill="${c}" stroke="${dk}" stroke-width="2"/>`;
+  s+= galo?`<path d="M84 52 q4 -22 14 -6 q6 -22 16 -4 q10 -18 14 4 q-20 10 -44 6Z" fill="#e03131"/>`:`<path d="M90 52 q4 -14 12 -4 q6 -14 14 -2 q-14 8 -26 6Z" fill="#e03131"/>`;
+  s+=`<path d="M70 84 L48 90 L70 96Z" fill="#f2a33a"/><path d="M74 98 q-4 16 6 20 q8 -6 2 -20Z" fill="#e03131"/>`;
+  s+=`<circle cx="96" cy="78" r="6" fill="#2a2a3a"/><circle cx="98" cy="76" r="2" fill="#fff"/>`;
+  if(opts.sad)s+=`<path d="M86 66 l12 5" stroke="#333" stroke-width="3" stroke-linecap="round"/>`;
+  if(!galo)s+=`<g transform="translate(118 50)"><path d="M0 0 L-12 -7 L-12 7Z M0 0 L12 -7 L12 7Z" fill="#ff5c9a"/><circle r="4" fill="#ff2d7a"/></g>`;
+  return s+`</g></svg>`;
+}
+function bearSVG(p,opts={},plush=false){
+  const c=p.look.fur,dk=shade(c),lt='#fff6ea';
+  let s=`<svg viewBox="0 0 300 230" xmlns="http://www.w3.org/2000/svg"><g>`;
+  s+=`<ellipse cx="150" cy="220" rx="90" ry="8" fill="rgba(0,0,0,.08)"/>`;
+  s+=`<ellipse cx="104" cy="196" rx="28" ry="22" fill="${c}"/><ellipse cx="196" cy="196" rx="28" ry="22" fill="${c}"/><ellipse cx="100" cy="200" rx="13" ry="11" fill="${lt}"/><ellipse cx="200" cy="200" rx="13" ry="11" fill="${lt}"/>`;
+  s+=`<ellipse cx="150" cy="160" rx="62" ry="54" fill="${c}"/><ellipse cx="150" cy="168" rx="36" ry="32" fill="${lt}"/>`;
+  s+=`<path d="M150 140 v56" stroke="${dk}" stroke-width="2" stroke-dasharray="5 4"/>`;
+  s+=`<ellipse cx="88" cy="150" rx="18" ry="30" fill="${c}" transform="rotate(25 88 150)"/><ellipse cx="212" cy="150" rx="18" ry="30" fill="${c}" transform="rotate(-25 212 150)"/>`;
+  if(plush){s+=`<ellipse cx="122" cy="34" rx="14" ry="40" fill="${c}"/><ellipse cx="178" cy="34" rx="14" ry="40" fill="${c}"/><ellipse cx="122" cy="36" rx="7" ry="28" fill="#ffd6e0"/><ellipse cx="178" cy="36" rx="7" ry="28" fill="#ffd6e0"/>`}
+  else{s+=`<circle cx="108" cy="52" r="20" fill="${c}"/><circle cx="192" cy="52" r="20" fill="${c}"/><circle cx="108" cy="52" r="10" fill="${lt}"/><circle cx="192" cy="52" r="10" fill="${lt}"/>`}
+  s+=`<circle cx="150" cy="86" r="50" fill="${c}"/><ellipse cx="150" cy="104" rx="24" ry="18" fill="${lt}"/><ellipse cx="150" cy="96" rx="9" ry="6" fill="#3a2a2a"/>`;
+  s+=`<circle cx="130" cy="78" r="8" fill="#1f1f2a"/><circle cx="170" cy="78" r="8" fill="#1f1f2a"/><circle cx="133" cy="75" r="2.6" fill="#fff"/><circle cx="173" cy="75" r="2.6" fill="#fff"/>`;
+  s+=`<path d="M126 74 l8 8 M134 74 l-8 8" stroke="#555" stroke-width="1" opacity=".5"/>`;
+  s+= opts.sad?`<path d="M140 116 q10 -6 20 0" stroke="#3a2a2a" stroke-width="3" fill="none" stroke-linecap="round"/>`:`<path d="M140 110 q10 8 20 0" stroke="#3a2a2a" stroke-width="3" fill="none" stroke-linecap="round"/>`;
+  s+=`<path d="M182 120 l10 -4 M186 128 l10 -2" stroke="${dk}" stroke-width="2" opacity=".6"/>`;
+  s+= p.sex==='f'?`<g transform="translate(172 44)"><path d="M0 0 L-14 -8 L-14 8Z M0 0 L14 -8 L14 8Z" fill="#ff5c9a"/><circle r="5" fill="#ff2d7a"/></g>`:`<g transform="translate(150 134)"><path d="M0 0 L-14 -8 L-14 8Z M0 0 L14 -8 L14 8Z" fill="#3d7bff"/><circle r="5" fill="#1c5fd6"/></g>`;
+  return s+`</g></svg>`;
+}
+function avatar(p,opts){
+  const sp=spOf(p);
+  if(sp==='pessoa')return personSVG(p,opts||{});
+  if(sp==='capivara')return capiSVG(p,opts||{});
+  if(sp==='galinha')return chickSVG(p,opts||{});
+  if(sp==='ursinho')return bearSVG(p,opts||{});
+  if(sp==='personagem')return bearSVG(p,opts||{},true);
+  return petSVG(p,opts||{});
+}
+const avInner=s=>s.replace(/^<svg[^>]*>/,'').replace(/<\/svg>\s*$/,'');
+const avVB=p=>spOf(p)==='pessoa'?[200,270]:[300,230];
+
+/* ---- pontos de exame no desenho (coordenadas do avatar) ---- */
+function anchors(p){
+  const sp=spOf(p);
+  if(sp==='pessoa'){
+    const child=p.age<13,hr=child?56:47,hy=child?78:66,ty=hy+hr-4,th=child?62:78,by=ty+th,legH=child?34:42;
+    return {forehead:[100,hy-hr*.45],heart:[112,ty+18],lung:[86,ty+16],belly:[100,ty+th-8],head:[100,hy-hr*.7],
+      arm:[150,ty+th-14],knee:[87,by+legH*.45],foot:[84,by+legH+2],pata:[84,by+legH+2],pelo:[100,hy-hr*.7],pele:[60,ty+30],olho:[100-hr*.36,hy+6],barriga:[100,ty+th-8],ear:[100-hr+2,hy+6]};
+  }
+  let a;
+  if(sp==='cachorro'||sp==='gato')a={forehead:[86,62],heart:[128,124],lung:[168,112],belly:[190,152],head:[86,52],pata:[112,200],foot:[216,200],knee:[112,170],pelo:[200,108],pele:[180,120],olho:[70,80],barriga:[190,152],ear:[52,90],arm:[112,176]};
+  else if(sp==='capivara')a={forehead:[86,62],heart:[124,138],lung:[170,118],belly:[196,166],head:[90,60],pata:[112,204],foot:[216,204],knee:[112,180],pelo:[200,100],pele:[180,130],olho:[74,78],barriga:[196,166],ear:[96,50],arm:[112,184]};
+  else if(sp==='galinha')a={forehead:[104,60],heart:[140,138],lung:[178,120],belly:[168,168],head:[104,60],pata:[138,206],foot:[162,206],knee:[138,186],pelo:[170,112],pele:[170,112],olho:[96,78],barriga:[168,168],ear:[116,86],arm:[200,128]};
+  else a={forehead:[150,58],heart:[150,152],lung:[124,146],belly:[150,180],head:[150,50],pata:[104,196],foot:[196,196],knee:[104,190],pelo:[190,130],pele:[190,140],olho:[130,78],barriga:[150,176],ear:[108,52],arm:[88,150]};
+  const pup=(sp==='cachorro'||sp==='gato'||sp==='capivara')&&p.age<=1;
+  if(pup)for(const k in a){a[k]=[150+(a[k][0]-150)*.85,225+(a[k][1]-225)*.85]}
+  return a;
+}
+
+/* ---- esqueletos novos (viewBox 400x260) ---- */
+function capiSkeleton(p){
+  const k=p.age<=1?.8:1;let s='';
+  const legs=(o,op)=>{let t=`<g opacity="${op}" transform="translate(${o} 0)">`;
+    t+=bone(140,124,134,164,8)+bone(134,166,138,200,6)+`<path class="bn" d="M130 204 h22 l4 9 h-28Z"/>`;
+    t+=bone(290,118,300,160,9)+bone(300,162,290,196,6)+`<path class="bn" d="M284 200 h22 l4 8 h-28Z"/>`;return t+'</g>'};
+  s+=legs(14,.45);
+  s+=`<path class="bn" d="M124 94 L156 98 L148 132 L130 128Z"/><path class="bn" d="M272 96 L314 100 L306 126 L282 124Z"/><circle cx="292" cy="114" r="6" class="hole"/>`;
+  for(let i=0;i<18;i++){const x=122+i*11,y=94-Math.sin(i/17*Math.PI)*14;s+=`<circle cx="${x}" cy="${y}" r="5.6" class="bn"/>`}
+  for(let i=0;i<9;i++){const x=148+i*13,len=80-Math.abs(i-3)*6;s+=`<path class="rib" d="M${x} 92 C${x-8} ${92+len*.4} ${x-6} ${92+len*.8} ${x+6} ${92+len}"/>`}
+  s+=legs(0,1);
+  for(let i=0;i<4;i++)s+=`<circle cx="${100+i*6}" cy="${92+i}" r="5" class="bn"/>`;
+  s+=`<path class="bn" d="M24 96 C22 70 44 58 72 58 C96 58 110 74 106 98 C102 116 84 122 64 120 L28 112Z"/><circle cx="74" cy="80" r="8" class="hole"/><path class="bn" d="M28 112 L66 120 L62 128 L32 122Z"/><path class="thin" d="M30 112 v8 M36 113 v8"/>`;
+  return `<g transform="translate(200 236) scale(${k}) translate(-200 -236)">${s}</g>`;
+}
+function chickSkeleton(p){
+  let s='';
+  s+=bone(190,170,186,206,6)+bone(186,208,190,236,4)+`<path class="bn" d="M176 238 h28 l-6 6 h-18Z"/>`;
+  s+=bone(214,170,218,206,6)+bone(218,208,214,236,4)+`<path class="bn" d="M204 238 h28 l-6 6 h-18Z"/>`;
+  s+=`<path class="bn" d="M150 120 C150 96 190 88 230 96 C270 104 284 130 270 150 C256 170 200 176 170 166 C152 160 150 140 150 120Z" fill-opacity=".25"/>`;
+  for(let i=0;i<6;i++){const x=168+i*16;s+=`<path class="rib" d="M${x} 104 C${x-6} 124 ${x-4} 146 ${x+4} 160"/>`}
+  s+=`<path class="bn" d="M162 108 L176 170 L184 170 L172 104Z"/>`;
+  s+=bone(196,104,236,112,6)+bone(236,112,276,102,5)+`<path class="bn" d="M276 102 l26 -6 l-4 10 l-22 4Z"/>`;
+  for(let i=0;i<7;i++){const t=i/6;const x=158-t*42,y=108-t*40;s+=`<circle cx="${x}" cy="${y}" r="5" class="bn"/>`}
+  s+=`<circle cx="110" cy="58" r="20" class="bn"/><circle cx="104" cy="54" r="7" class="hole"/><path class="bn" d="M92 60 L66 66 L92 72Z"/>`;
+  for(let i=0;i<5;i++)s+=`<ellipse cx="${274+i*7}" cy="${138-i*7}" rx="5" ry="4" class="bn"/>`;
+  return s;
+}
+function plushInside(p){
+  let s=`<path d="M70 170 C60 110 110 70 200 72 C290 74 340 110 330 170 C322 214 270 236 200 236 C130 236 78 214 70 170Z" fill="rgba(255,255,255,.05)" stroke="#bdf1ff" stroke-width="2" stroke-dasharray="6 5"/>`;
+  const pts=[[130,120],[170,100],[220,104],[262,126],[290,160],[250,190],[200,206],[150,196],[110,166],[190,150],[240,160],[150,150]];
+  pts.forEach(([x,y],i)=>s+=`<g fill="#e9fbff" opacity=".75"><circle cx="${x}" cy="${y}" r="${16+(i%3)*4}"/><circle cx="${x+14}" cy="${y-6}" r="${12+(i%2)*4}"/><circle cx="${x-12}" cy="${y+6}" r="11"/></g>`);
+  s+=`<path d="M200 70 v166" stroke="#bdf1ff" stroke-width="2" stroke-dasharray="4 6"/>`;
+  return s;
+}
+function genericSilhouette(p){
+  const sp=spOf(p);
+  if(sp==='capivara')return `<path class="sil" d="M60 110 C60 70 130 60 200 62 C280 64 320 90 318 130 C316 176 270 190 200 190 C130 190 60 176 60 110Z"/><path class="sil" d="M14 96 C12 66 40 50 72 50 C104 50 122 72 120 100 C118 126 96 138 70 138 C40 138 16 122 14 96Z"/>${[146,160,300,314].map(x=>`<line class="silln" x1="${x}" y1="150" x2="${x}" y2="214" stroke-width="26"/>`).join('')}`;
+  if(sp==='galinha')return `<ellipse cx="216" cy="132" rx="80" ry="54" class="sil"/><circle cx="112" cy="66" r="32" class="sil"/><path class="silln" d="M190 170 v70 M214 170 v70" stroke-width="10"/><path class="sil" d="M80 66 L52 72 L80 80Z"/>`;
+  return `<ellipse cx="200" cy="160" rx="120" ry="74" class="sil"/><circle cx="200" cy="80" r="56" class="sil"/>`;
+}
+
+/* ============ CASOS CLINICOS ============ */
+const ALLSP=['pessoa','cachorro','gato','capivara','galinha','ursinho','personagem'];
+const MAM=['cachorro','gato','capivara'],PLUSH=['ursinho','personagem'];
+const CASES=[
+ {id:'gripe',name:'Gripe',emo:'🤒',sp:ALLSP,f:{febre:1,chiado:1,rapido:1},hint:'Que tal medir a temperatura e escutar o pulmão com o estetoscópio?',treat:['compressa','xarope'],ret:'check',care:'Descansar bastante, beber água e ficar quentinho.',
+  say:{pessoa:['Atchim! Doutora, estou espirrando, com o corpo quente e muito cansad{o}.','Estou com o nariz escorrendo e o corpo quentinho.'],pet:['{O} {nome} está quietinh{o}, espirrando e com o corpo quente.'],pelucia:['{O} {nome} pegou um friozinho e está espirrando algodão!']}},
+ {id:'garganta',name:'Garganta inflamada',emo:'😮',sp:['pessoa','cachorro','gato',...PLUSH],f:{febre:1,oto:{boca:'garganta'}},hint:'Que tal olhar a boca com o otoscópio?',treat:['chamel'],ret:'check',care:'Comer comidinha morna e falar pouquinho.',
+  say:{pessoa:['Dói muito quando eu engulo, doutora.','Minha garganta está arranhando.'],pet:['{O} {nome} não quer comer e fica tossindo.'],pelucia:['{O} {nome} perdeu a voz de tanto cantar!']}},
+ {id:'cera',name:'Ouvido entupido de cera',emo:'👂',sp:['pessoa',...MAM,...PLUSH],f:{oto:{ouvido:'cera'}},hint:'Que tal olhar o ouvido com o otoscópio?',treat:['limparOuvido'],ret:null,care:'Limpar só a parte de fora da orelha, com cuidado.',
+  say:{pessoa:['Não estou escutando direito de um lado.','Tem um barulhinho estranho no meu ouvido.'],pet:['{O} {nome} fica balançando a cabeça e coçando a orelha.'],pelucia:['{O} {nome} não escuta quando eu chamo!']}},
+ {id:'ouvido',name:'Dor de ouvido',emo:'🙉',sp:['pessoa','cachorro','gato'],f:{febre:1,oto:{ouvido:'vermelho'}},hint:'Que tal olhar o ouvido com o otoscópio?',treat:['gotasOuvido'],ret:'check',care:'Não deixar entrar água no ouvido por uns dias.',
+  say:{pessoa:['Meu ouvido está doendo muito!','Está latejando aqui dentro da orelha.'],pet:['{O} {nome} chora quando a gente encosta na orelha.']}},
+ {id:'braco',name:'Braço quebrado',emo:'🦴',sp:['pessoa'],f:{xray:{t:'fratura',w:'braco'}},hint:'Que tal tirar um raio-x?',treat:['gessoBraco','tipoia'],ret:'gesso',care:'Não molhar o gesso e não fazer força com o braço.',
+  say:{pessoa:['Caí do escorregador e meu braço dói muito!','Ai, ai! Não consigo mexer o braço.']}},
+ {id:'perna',name:'Perna quebrada',emo:'🦵',sp:['pessoa'],f:{xray:{t:'fratura',w:'perna'}},hint:'Que tal tirar um raio-x?',treat:['gessoPerna','muletas'],ret:'gesso',care:'Andar só com as muletas e deixar a perna para cima.',
+  say:{pessoa:['Caí jogando bola e minha perna está doendo!','Não consigo andar, dói muito a perna.']}},
+ {id:'pata',name:'Patinha quebrada',emo:'🐾',sp:MAM,f:{xray:{t:'fratura',w:'pata'}},hint:'Que tal tirar um raio-x?',treat:['tala'],ret:'tala',care:'Nada de pular do sofá até sarar!',
+  say:{pet:['{O} {nome} pulou do sofá e está mancando.','{O} {nome} não quer pisar com a patinha da frente.']}},
+ {id:'asa',name:'Asinha machucada',emo:'🪽',sp:['galinha'],f:{xray:{t:'fratura',w:'asa'}},hint:'Que tal tirar um raio-x?',treat:['enfaixarAsa'],ret:'tala',care:'Ficar no ninho quentinho, sem voar.',
+  say:{pet:['{O} {nome} caiu do poleiro e não abre a asinha.']}},
+ {id:'corte',name:'Machucado com corte',emo:'🩹',sp:['pessoa',...MAM],f:{lupa:{t:'corte',w:'knee'}},hint:'Que tal procurar com a lupa?',treat:['limparCorte','curativo'],ret:'curativo',care:'Trocar o curativo se molhar.',
+  say:{pessoa:['Caí de bicicleta e machuquei, está ardendo.','Ralei brincando e está doendo.'],pet:['{O} {nome} se machucou brincando no quintal.']}},
+ {id:'espinho',name:'Espinho',emo:'🌵',sp:['pessoa',...MAM],f:{lupa:{t:'espinho',w:'pata'}},hint:'Que tal procurar com a lupa?',treat:['tirarEspinho','curativo'],ret:'curativo',care:'Usar sapato no jardim!',
+  say:{pessoa:['Pisei em alguma coisa no jardim e dói quando eu ando.'],pet:['{O} {nome} está lambendo a patinha e mancando.']}},
+ {id:'engoliu',name:'Engoliu um botão',emo:'🔘',sp:['pessoa','cachorro','gato','galinha',...PLUSH],f:{xray:{t:'objeto'},barriga:'leve'},hint:'Que tal tirar um raio-x da barriga?',treat:['endoscopio'],ret:'check',care:'Botão não é de comer! Guardar os botões longe.',
+  say:{pessoa:['Doutora... acho que engoli um botão sem querer!','Minha barriga está estranha depois que brinquei com botões.'],pet:['{O} {nome} estava brincando com os botões da minha blusa e agora sumiu um!'],pelucia:['{O} {nome} está fazendo barulho de chocalho na barriga!']}},
+ {id:'barriga',name:'Dor de barriga',emo:'🤢',sp:['pessoa',...MAM,'galinha'],f:{barriga:'forte'},hint:'Que tal escutar a barriga com o estetoscópio?',treat:['bolsaMorna','cha'],ret:'check',care:'Comida levinha e nada de doce por uns dias.',
+  say:{pessoa:['Comi muito doce na festa e minha barriga está doendo!','Minha barriga está fazendo barulho e dói.'],pet:['{O} {nome} comeu uma coisa do chão e está com dor de barriga.']}},
+ {id:'dente',name:'Dor de dente',emo:'🦷',sp:['pessoa','cachorro','capivara'],f:{oto:{boca:'carie'}},hint:'Que tal olhar a boca com o otoscópio?',treat:['escovar'],ret:null,care:'Escovar os dentes depois de comer.',
+  say:{pessoa:['Dói o dente quando eu como doce.','Meu dente está doendo!'],pet:['{O} {nome} está mastigando só de um lado.']}},
+ {id:'cisco',name:'Cisco no olho',emo:'👁️',sp:['pessoa',...MAM,'galinha'],f:{oto:{olho:'cisco'}},hint:'Que tal olhar o olho com o otoscópio?',treat:['colirio'],ret:null,care:'Não coçar o olho com a mão suja.',
+  say:{pessoa:['Entrou alguma coisa no meu olho e está coçando!','Meu olho está vermelho e lacrimejando.'],pet:['{O} {nome} fica piscando e coçando o olho.']}},
+ {id:'alergia',name:'Alergia',emo:'🤧',sp:['pessoa','cachorro','gato'],f:{chiado:1,lupa:{t:'alergia',w:'pele'}},hint:'Que tal procurar com a lupa e escutar o pulmão?',treat:['tirarAlergenos','xarope'],ret:'check',care:'Deixar a casa sem poeira e longe das flores que dão alergia.',
+  say:{pessoa:['Atchim! Atchim! Não paro de espirrar e minha pele está coçando.'],pet:['{O} {nome} está espirrando e se coçando todo.']}},
+ {id:'pressao',name:'Pressão alta',emo:'🩺',sp:['pessoa'],adult:30,f:{pressao:1},hint:'Que tal medir a pressão?',treat:['caixaRemedio','tirarSal'],ret:'check',care:'Comer com pouco sal e tomar o remédio todo dia.',
+  say:{pessoa:['Doutora, estou com dor de cabeça e meio tont{o}.','Minha cabeça está latejando.']}},
+ {id:'pulgas',name:'Pulgas',emo:'🐜',sp:MAM,f:{lupa:{t:'pulgas',w:'pelo'}},hint:'Que tal procurar no pelo com a lupa?',treat:['catarPulgas','banho'],ret:null,care:'Dar banho e limpar a caminha.',
+  say:{pet:['{O} {nome} não para de se coçar!','{O} {nome} se coça a noite inteira.']}},
+ {id:'piolho',name:'Piolhos',emo:'🪲',sp:['pessoa','galinha'],child:13,f:{lupa:{t:'piolho',w:'head'}},hint:'Que tal procurar na cabeça com a lupa?',treat:['catarPiolho','pentear'],ret:null,care:'Pentear todo dia e não dividir pente.',
+  say:{pessoa:['Minha cabeça está coçando muito!'],pet:['{O} {nome} fica bicando as próprias penas sem parar.']}},
+ {id:'carrapato',name:'Carrapato',emo:'🕷️',sp:['cachorro','capivara'],f:{lupa:{t:'carrapato',w:'pelo'}},hint:'Que tal procurar no pelo com a lupa?',treat:['tirarCarrapato'],ret:null,care:'Olhar o pelo sempre que voltar do mato.',
+  say:{pet:['{O} {nome} voltou do mato se coçando atrás da orelha.']}},
+ {id:'unha',name:'Unhas grandes',emo:'💅',sp:[...MAM,'galinha'],f:{lupa:{t:'unha',w:'pata'}},hint:'Que tal olhar as patinhas com a lupa?',treat:['cortarUnha'],ret:null,care:'Cortar as unhas de tempos em tempos.',
+  say:{pet:['{O} {nome} está fazendo tec tec tec no chão quando anda.','{O} {nome} está arranhando tudo!']}},
+ {id:'costura',name:'Costura rasgada',emo:'🧵',sp:PLUSH,f:{lupa:{t:'rasgo',w:'barriga'},xray:{t:'enchimento'}},hint:'Que tal procurar com a lupa?',treat:['encher','costurar'],ret:'check',care:'Brincar com carinho, sem puxar.',
+  say:{pelucia:['{O} {nome} está perdendo algodão pela barriga!','Rasgou um pedacinho d{o} {nome} na brincadeira.']}},
+ {id:'olhoBotao',name:'Olho de botão solto',emo:'👀',sp:PLUSH,f:{lupa:{t:'olhoSolto',w:'olho'},oto:{olho:'solto'}},hint:'Que tal olhar o olho com o otoscópio ou com a lupa?',treat:['botaoOlho','costurarOlho'],ret:null,care:'Não puxar o olhinho!',
+  say:{pelucia:['O olhinho d{o} {nome} está quase caindo!']}},
+ {id:'sujo',name:'Precisa de banho',emo:'🛁',sp:[...PLUSH,'cachorro'],f:{lupa:{t:'sujeira',w:'pele'}},hint:'Que tal olhar bem de pertinho com a lupa?',treat:['banho','secar'],ret:null,care:'Tomar banho sempre que se sujar.',
+  say:{pelucia:['{O} {nome} caiu na lama e está tod{o} sujinh{o}!'],pet:['{O} {nome} rolou na lama!']}},
+ {id:'vacina',name:'Check-up e vacina',emo:'💉',sp:ALLSP,f:{},hint:'Os exames estão dando tudo normal... talvez seja só um check-up!',treat:['alcool','injecao','curativoVacina'],ret:null,care:'Pode brincar normalmente!',
+  say:{pessoa:['Oi, doutora! Vim fazer um check-up e tomar vacina.'],pet:['{O} {nome} veio fazer o check-up do ano!'],pelucia:['{O} {nome} veio tomar a vacina das pelúcias!']}}
+];
+const CASE=Object.fromEntries(CASES.map(c=>[c.id,c]));
+const LEGACY={febre:'Gripe com febre',fratura:'Osso quebrado',pressao:'Pressão alta',barriga:'Dor de barriga',saudavel:'Está tudo bem',retorno:'Retorno: sarou!'};
+function casesFor(p){const sp=spOf(p);return CASES.filter(c=>c.sp.includes(sp)&&(!c.adult||p.age>=c.adult)&&(!c.child||sp!=='pessoa'||p.age<c.child))}
+function fillSay(t,p){const o=p.sex==='f'?'a':'o';return t.replace(/\{nome\}/g,p.name).replace(/\{O\}/g,o.toUpperCase()).replace(/\{o\}/g,o)}
+function makeCase(p,forceId){
+  const sp=spOf(p),list=casesFor(p);
+  const c=forceId&&CASE[forceId]?CASE[forceId]:pick(list);
+  p.caseId=c.id;p.f=JSON.parse(JSON.stringify(c.f));p.cond=c.id;
+  // posicoes de lupa adequadas a especie
+  if(p.f.lupa){const w=p.f.lupa.w;if(w==='knee'&&sp!=='pessoa')p.f.lupa.w='pata';if(w==='pata'&&sp==='pessoa'&&c.id==='espinho')p.f.lupa.w='foot'}
+  if(p.f.xray&&p.f.xray.t==='fratura'&&!p.f.xray.w)p.f.xray.w='braco';
+  // temperatura
+  const T={pessoa:[36.1,36.9,38.3,39.6,'Para pessoas, até 37,5 °C é normal.'],cachorro:[38.3,39,39.8,40.6,'Para cachorro, até 39,2 °C é normal.'],gato:[38.3,39,39.8,40.6,'Para gato, até 39,2 °C é normal.'],
+    capivara:[37.5,38.3,39.5,40.2,'Para capivara, até 38,5 °C é normal.'],galinha:[40.6,41.6,42.4,43,'Galinha é quentinha: até 42 °C é normal!'],ursinho:[36.4,36.8,38.3,38.9,'Para pelúcia, até 37,5 °C é normal.'],personagem:[36.4,36.8,38.3,38.9,'Para pelúcia, até 37,5 °C é normal.']}[sp];
+  p.temp=p.f.febre?rnd(T[2],T[3]):rnd(T[0],T[1]);p.tempRef=T[4];
+  p.bp=p.f.pressao?[pick([15,16,17]),pick([10,11])]:[pick([11,12]),pick([7,8])];
+  let base={pessoa:p.age<13?95:p.age>=65?70:76,cachorro:100,gato:160,capivara:90,galinha:250,ursinho:70,personagem:70}[sp];
+  if(p.f.rapido||p.f.febre)base+=sp==='galinha'?40:18;
+  p.bpm=Math.round(base+rnd(-4,4));
+  const aud=kindOf(sp);const lines=c.say[aud]||c.say.pet||c.say.pessoa;
+  let txt=fillSay(pick(lines),p);
+  if(aud==='pet')txt=(SPECIES[sp].voice?SPECIES[sp].voice+' ':'')+'O dono conta: '+txt;
+  if(aud==='pelucia')txt='A dona conta: '+txt;
+  p.complaint=txt;
+  return c;
+}
+const NAMES={pessoa:{f:['Ana','Laura','Sofia','Júlia','Alice','Manuela','Vovó Rosa','Tia Bia'],m:['Pedro','Lucas','Davi','Miguel','Vovô Zé','Tio Caio','Gabriel','Arthur']},
+  cachorro:{f:['Mel','Pipoca','Luna','Pérola','Nina'],m:['Rex','Thor','Bob','Paçoca','Max']},gato:{f:['Mimi','Frajola','Luna','Nala','Bolinha'],m:['Tom','Garfield','Simba','Fumaça','Félix']},
+  capivara:{f:['Capitu','Jabuticaba','Lili'],m:['Capitão','Feijão','Tonico']},galinha:{f:['Cocó','Pintadinha','Margarida'],m:['Galo Zeca','Cocoricó','Pedrinho']},
+  ursinho:{f:['Ursinha Mel','Fofinha','Teca'],m:['Ursinho Pom','Fofão','Bolota']},personagem:{f:['Fofura','Princesa','Bebel'],m:['Amigão','Heróizinho','Pingo']}};
+
 /* ============ FICHA ============ */
 function newPatient(prefName){
-  S.form={kind:null,species:null,sex:null,queixa:null,photo:null};S.editing=null;
+  S.form={species:null,sex:null,photo:null};S.editing=null;S.forceCase=null;
   $('#backBanner').classList.add('hidden');
   $('#pName').value=typeof prefName==='string'?prefName:'';$('#pAge').value=8;
   $('#fichaTitle').textContent='Prontuário da '+S.doc.name;
   refreshFicha();go('ficha');
 }
 function setSel(box,v){document.querySelectorAll(box+' .choice').forEach(b=>b.classList.toggle('sel',b.dataset.v===v))}
-function setKind(k){click();S.form.kind=k;S.form.species=null;if(k==='pet'){$('#pAge').value=3}else{$('#pAge').value=8}refreshFicha();
-  if(k==='pet')say('Que bichinho é?');else say('É menina ou menino?');}
-function setSpecies(s){click();S.form.species=s;refreshFicha();say(s==='cachorro'?'Um cachorrinho! É fêmea ou macho?':'Um gatinho! É fêmea ou macho?')}
+function setSpecies(sp){click();const was=S.form.species;S.form.species=sp;if(was!==sp)$('#pAge').value=SPECIES[sp].def;refreshFicha();
+  say(sp==='personagem'?'Tire uma foto da pelúcia! É menina ou menino?':sp==='pessoa'?'É menina ou menino?':kindOf(sp)==='pelucia'?'É menina ou menino?':'É fêmea ou macho?');
+  if(sp==='personagem'&&!S.form.photo)setTimeout(()=>{const b=$('#photoPrev');if(b&&b.scrollIntoView)b.scrollIntoView({behavior:'smooth',block:'center'})},300)}
 function setSex(x){click();S.form.sex=x;refreshFicha();say('Qual é o nome do paciente?');setTimeout(()=>$('#pName').focus(),200)}
 function refreshFicha(){
-  const f=S.form;setSel('#kindCh',f.kind);setSel('#specCh',f.species);setSel('#sexCh',f.sex);
-  $('#speciesBox').classList.toggle('hidden',f.kind!=='pet');
-  $('#restBox').classList.toggle('hidden',!(f.kind==='pessoa'||(f.kind==='pet'&&f.species)));
+  const f=S.form,sp=f.species;setSel('#specCh',sp);setSel('#sexCh',f.sex);
+  $('#restBox').classList.toggle('hidden',!sp);
   const age=+$('#pAge').value||0;
-  if(f.kind==='pet'){$('#sexLabel').textContent='É fêmea ou macho?';$('#sexF').textContent='Fêmea';$('#sexM').textContent='Macho';}
-  else if(age<13){$('#sexLabel').textContent='É menina ou menino?';$('#sexF').textContent='Menina';$('#sexM').textContent='Menino';}
-  else{$('#sexLabel').textContent='É mulher ou homem?';$('#sexF').textContent='Mulher';$('#sexM').textContent='Homem';}
+  if(sp&&kindOf(sp)==='pet'){$('#sexLabel').textContent=sp==='galinha'?'É galinha ou galo?':'É fêmea ou macho?';$('#sexF').textContent=sp==='galinha'?'Galinha':'Fêmea';$('#sexM').textContent=sp==='galinha'?'Galo':'Macho'}
+  else if(sp==='pessoa'&&age>=13){$('#sexLabel').textContent='É mulher ou homem?';$('#sexF').textContent='Mulher';$('#sexM').textContent='Homem'}
+  else{$('#sexLabel').textContent='É menina ou menino?';$('#sexF').textContent='Menina';$('#sexM').textContent='Menino'}
   $('#ageUnit').textContent=age===1?'ano':'anos';
-  renderQueixas();refreshPhoto();
+  refreshPhoto();
 }
-const QUEIXAS=[{v:'febre',t:'Febre',ic:()=>IC.thermo('#ff4d5e')},{v:'fratura',t:'Machucou',ic:()=>IC.broken('#ff4d5e')},{v:'barriga',t:'Dor de barriga',ic:()=>IC.tummy('#8a5cf6')},{v:'pressao',t:'Dor de cabeça',ic:()=>IC.gauge('#ff4d5e'),adult:true},{v:'saudavel',t:'Check-up',ic:()=>IC.happy('#ffd43b')},{v:'misterio',t:'Não sei',ic:()=>`<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="26" fill="#b197fc"/><text x="32" y="44" font-size="34" text-anchor="middle" font-family="Fredoka" font-weight="700" fill="#fff">?</text></svg>`}];
-function renderQueixas(){const f=S.form,age=+$('#pAge').value||0;const list=QUEIXAS.filter(q=>!q.adult||(f.kind==='pessoa'&&age>=30));
-  if(f.queixa&&!list.find(q=>q.v===f.queixa))f.queixa=null;
-  $('#queixaCh').innerHTML=list.map(q=>`<button class="choice ${f.queixa===q.v?'sel':''}" data-v="${q.v}" onclick="setQueixa('${q.v}')">${q.ic()}${q.t}</button>`).join('')}
-function setQueixa(v){click();S.form.queixa=v;renderQueixas()}
-function stepAge(d){click();const max=S.form.kind==='pet'?25:110;let v=(+$('#pAge').value||0)+d;v=Math.max(1,Math.min(max,v));$('#pAge').value=v;refreshFicha()}
+function stepAge(d){click();const max=S.form.species?SPECIES[S.form.species].max:110;let v=(+$('#pAge').value||0)+d;v=Math.max(1,Math.min(max,v));$('#pAge').value=v;refreshFicha()}
 function ageTyped(){refreshFicha()}
-function randomName(){
-  click();const f=S.form;const key=f.kind==='pet'?f.species:'pessoa';const sx=f.sex||pick(['f','m']);
-  if(!f.sex){f.sex=sx;}
-  $('#pName').value=pick(NAMES[key][sx]);refreshFicha();
-}
+function randomName(){click();const f=S.form;if(!f.species)return;const sx=f.sex||pick(['f','m']);if(!f.sex)f.sex=sx;$('#pName').value=pick(NAMES[f.species][sx]);refreshFicha()}
 function startConsult(){
   const f=S.form,name=$('#pName').value.trim();
-  if(!f.kind||(f.kind==='pet'&&!f.species)){return}
+  if(!f.species)return;
   if(!f.sex){$('#sexCh').classList.add('shake');setTimeout(()=>$('#sexCh').classList.remove('shake'),400);say($('#sexLabel').textContent);return}
   if(!name){$('#pName').classList.add('shake');setTimeout(()=>$('#pName').classList.remove('shake'),400);say('Qual é o nome do paciente?');$('#pName').focus();return}
-  let age=Math.max(1,Math.min(f.kind==='pet'?25:110,parseInt($('#pAge').value)||1));
+  const sp=f.species,kind=kindOf(sp);
+  let age=Math.max(1,Math.min(SPECIES[sp].max,parseInt($('#pAge').value)||1));
   let rec=S.editing?recById(S.editing):null;
   if(rec){
-    if(rec.kind!==f.kind||rec.species!==f.species){rec.look=newLook(f.kind,f.species);rec.base=null}
-    Object.assign(rec,{kind:f.kind,species:f.species,sex:f.sex,name,age,photo:f.photo||null});
+    if(spOf(rec)!==sp){rec.look=newLook(kind,sp);rec.base=null}
+    Object.assign(rec,{kind,species:sp,sex:f.sex,name,age,photo:f.photo||null});
   }else{
-    rec={id:'p'+Date.now().toString(36)+Math.floor(Math.random()*1000),kind:f.kind,species:f.species,sex:f.sex,name,age,photo:f.photo||null,look:newLook(f.kind,f.species),visits:[],base:null};
+    rec={id:'p'+Date.now().toString(36)+Math.floor(Math.random()*1000),kind,species:sp,sex:f.sex,name,age,photo:f.photo||null,look:newLook(kind,sp),visits:[],base:null};
     DB.patients.push(rec);S.editing=rec.id;
   }
   rec.last=Date.now();saveDB();
-  const p={kind:rec.kind,species:rec.species,sex:rec.sex,name:rec.name,age:rec.age,look:rec.look,photo:rec.photo};
-  S.rec=rec;S.visit={date:Date.now(),doc:S.doc.id};S.visitSaved=false;S.otoFind=null;S.baby=null;S.meas=null;
-  makeCase(p);if(rec.visits.length&&p.kind==='pessoa')p.complaint='Voltei! '+p.complaint;
-  S.p=p;S.done={};S.notes=[];S.diag=null;S.rxSel=new Set();
+  beginVisit(rec,false);
+}
+function beginVisit(rec,retorno){
+  const p={kind:rec.kind,species:spOf(rec),sex:rec.sex,name:rec.name,age:rec.age,look:rec.look,photo:rec.photo};
+  S.rec=rec;S.visit={date:Date.now(),doc:S.doc.id};S.visitSaved=false;S.otoFind=null;S.baby=null;S.meas=null;S.found={};S.wrong=0;
+  S.p=p;S.done={};S.notes=[];S.diag=null;
+  if(retorno){startRetorno();return}
+  const c=makeCase(p,S.forceCase);S.forceCase=null;S.case=c;
+  if(rec.visits.length&&p.kind==='pessoa')p.complaint='Voltei! '+p.complaint;
   renderConsult();go('consulta');
   setTimeout(()=>say(p.complaint),350);
 }
 
-/* ============ CASO CLINICO ============ */
-function makeCase(p){
-  const pet=p.kind==='pet';
-  let opts=pet?['febre','fratura','barriga','saudavel']:['febre','fratura','barriga','saudavel'];
-  if(!pet&&p.age>=30)opts.push('pressao','pressao');
-  p.mystery=!S.form.queixa||S.form.queixa==='misterio';
-  p.cond=p.mystery?pick(opts):S.form.queixa;
-  // temperatura
-  if(pet) p.temp=p.cond==='febre'?rnd(39.8,40.6):rnd(38.3,39.0);
-  else p.temp=p.cond==='febre'?rnd(38.3,39.6):rnd(36.1,36.9);
-  // pressao
-  p.bp=p.cond==='pressao'?[pick([15,16,17]),pick([10,11])]:[pick([11,12]),pick([7,8])];
-  // batimentos
-  let base=pet?(p.species==='cachorro'?100:160):(p.age<13?95:p.age>=65?70:76);
-  if(p.cond==='febre')base+=pet?20:18;
-  p.bpm=Math.round(base+rnd(-4,4));
-  const o=p.sex==='f'?'a':'o', O=p.sex==='f'?'A':'O', nm=p.name;
-  const C={pessoa:{
-      febre:'Doutora, estou com o corpo quentinho e muito cansad'+o+'.',
-      fratura:'Ai, ai! Caí da bicicleta e meu braço está doendo muito!',
-      pressao:'Doutora, estou com dor de cabeça e meio tont'+o+'.',
-      barriga:'Doutora, minha barriga está doendo e fazendo barulho!',
-      saudavel:'Oi, doutora! Vim só fazer um check-up.'},
-    pet:{
-      febre:`${O} ${nm} está quietinh${o}, sem vontade de brincar e com o focinho quente.`,
-      fratura:`${O} ${nm} pulou do sofá e está mancando da patinha da frente.`,
-      barriga:`${O} ${nm} comeu uma coisa estranha no quintal e está com dor de barriga.`,
-      saudavel:`${O} ${nm} está ótim${o}! Veio fazer um check-up e tomar a vacina do ano.`}};
-  if(p.mystery){p.complaint=pet?`${pet?(p.species==='cachorro'?'Au au! ':'Miau! '):''}O dono não sabe o que ${p.sex==='f'?'ela':'ele'} tem. Vamos examinar!`:'Doutora, não sei o que eu tenho. Pode me examinar?';return}
-  p.complaint=(pet?(p.species==='cachorro'?'Au au! ':'Miau! ')+'O dono conta: ':'')+C[p.kind][p.cond];
-}
-
 /* ============ CONSULTA ============ */
-function avatar(p,opts){return p.kind==='pessoa'?personSVG(p,opts):petSVG(p,opts)}
-function sexWord(p){if(p.kind==='pet')return p.sex==='f'?'fêmea':'macho';if(p.age<13)return p.sex==='f'?'menina':'menino';return p.sex==='f'?'mulher':'homem'}
+function sexWord(p){const sp=spOf(p);if(sp==='galinha')return p.sex==='f'?'galinha':'galo';if(p.kind==='pet')return p.sex==='f'?'fêmea':'macho';if(p.kind==='pelucia'||p.age<13)return p.sex==='f'?'menina':'menino';return p.sex==='f'?'mulher':'homem'}
+function spLabel(p){return SPECIES[spOf(p)].label}
 function renderConsult(){
   const p=S.p;
-  $('#consTitle').textContent=(p.kind==='pet'?'Consulta veterinária':'Consulta médica')+' • '+S.doc.name;
-  $('#pAvatar').innerHTML=pic(p,{sad:p.cond!=='saudavel'});
+  $('#consTitle').textContent=(p.kind==='pessoa'?'Consulta médica':p.kind==='pelucia'?'Consulta de pelúcia':'Consulta veterinária')+' • '+S.doc.name;
+  $('#pAvatar').innerHTML=pic(p,{sad:p.caseId!=='vacina'});
   const hv=S.rec.visits.slice(-4).reverse();$('#histBox').classList.toggle('hidden',!hv.length);
   $('#hist').innerHTML=hv.map(v=>`<li>${fmtDate(v.date)} • ${DOCS[v.doc]?DOCS[v.doc].name:''}: <b>${diagName(p,v.diag)}</b> ${v.sticker?STICKERS[v.sticker]:''}</li>`).join('');
   $('#pNameShow').textContent=p.name;
-  $('#pInfoShow').textContent=(p.kind==='pet'?(p.species==='cachorro'?'Cachorro':'Gato'):'Pessoa')+', '+sexWord(p)+', '+p.age+(p.age===1?' ano':' anos');
+  $('#pInfoShow').textContent=spLabel(p)+', '+sexWord(p)+', '+p.age+(p.age===1?' ano':' anos');
   $('#pComplaint').textContent=p.complaint;
   renderNotes();renderTools();
 }
-function renderNotes(){
-  $('#notes').innerHTML=S.notes.length?S.notes.map(n=>`<li>${n}</li>`).join(''):`<li class="empty">Use os aparelhos para examinar o paciente.</li>`;
-}
-function addNote(key,html){S.notes=S.notes.filter(n=>!n.startsWith(`<!--${key}-->`));S.notes.push(`<!--${key}-->`+html);S.done[key]=true;renderNotes();renderTools()}
+function renderNotes(){$('#notes').innerHTML=S.notes.length?S.notes.map(n=>`<li>${n}</li>`).join(''):`<li class="empty">Use os aparelhos para descobrir o que o paciente tem.</li>`}
+function addNote(key,html){S.notes=S.notes.filter(n=>!n.startsWith(`<!--${key}-->`));S.notes.push(`<!--${key}-->`+html);S.done[key.split('-')[0]]=true;renderNotes();renderTools()}
 const TOOLS=[
   {id:'xray',name:'Raio-X',ic:`<svg viewBox="0 0 100 100"><rect x="8" y="8" width="84" height="84" rx="14" fill="#0e2a40"/><circle cx="50" cy="28" r="10" fill="#e9fbff"/><rect x="47" y="38" width="6" height="30" fill="#e9fbff"/><path d="M36 46 h28 M38 54 h24 M40 62 h20" stroke="#e9fbff" stroke-width="4" stroke-linecap="round"/><path d="M50 68 L40 86 M50 68 L60 86 M47 44 L32 62 M53 44 L68 62" stroke="#e9fbff" stroke-width="4" stroke-linecap="round"/></svg>`},
   {id:'thermo',name:'Termômetro',ic:`<svg viewBox="0 0 100 100"><path d="M20 30 h46 a10 10 0 0 1 10 10 v8 a10 10 0 0 1-10 10 H46 l-6 30 H26 l4-30 h-10Z" fill="#fff" stroke="#556" stroke-width="3"/><rect x="28" y="36" width="30" height="16" rx="3" fill="#cfe8c8"/><text x="43" y="49" font-size="12" text-anchor="middle" font-family="monospace" font-weight="700" fill="#1b2a1b">36,5</text><path d="M78 44 h16" stroke="#ff2d4a" stroke-width="4" stroke-dasharray="4 3"/><rect x="34" y="62" width="10" height="10" rx="2" fill="#ff4d5e"/></svg>`},
+  {id:'stetho',name:'Estetoscópio',ic:`<svg viewBox="0 0 100 100"><path d="M30 12 v26 a20 20 0 0 0 40 0 V12" stroke="#4a5568" stroke-width="6" fill="none"/><path d="M50 58 v12 a14 14 0 0 0 28 0 v-6" stroke="#4a5568" stroke-width="6" fill="none"/><circle cx="78" cy="58" r="11" fill="#9aa5b8" stroke="#4a5568" stroke-width="4"/><circle cx="30" cy="12" r="5" fill="#4a5568"/><circle cx="70" cy="12" r="5" fill="#4a5568"/></svg>`},
+  {id:'oto',name:'Otoscópio',ic:`<svg viewBox="0 0 100 100"><rect x="38" y="48" width="18" height="44" rx="8" fill="#4a5568"/><path d="M30 26 h34 l-6 24 H36Z" fill="#9aa5b8" stroke="#4a5568" stroke-width="3"/><path d="M64 30 L92 22 L92 46 L64 40Z" fill="#cfd6e2" stroke="#4a5568" stroke-width="3"/><circle cx="47" cy="36" r="6" fill="#ffd43b"/></svg>`},
+  {id:'lupa',name:'Lupa',ic:`<svg viewBox="0 0 100 100"><circle cx="42" cy="42" r="28" fill="#e7f5ff" stroke="#4a5568" stroke-width="7"/><path d="M62 62 L88 88" stroke="#4a5568" stroke-width="12" stroke-linecap="round"/><path d="M28 34 q8 -12 22 -10" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round"/></svg>`},
   {id:'bp',name:'Pressão',ic:`<svg viewBox="0 0 100 100"><circle cx="58" cy="44" r="30" fill="#fff" stroke="#556" stroke-width="4"/><path d="M36 54 a24 24 0 0 1 44 -18" stroke="#69db7c" stroke-width="6" fill="none"/><path d="M58 44 L74 30" stroke="#333" stroke-width="4" stroke-linecap="round"/><path d="M30 60 q-14 10 -10 24" stroke="#556" stroke-width="4" fill="none"/><ellipse cx="20" cy="88" rx="10" ry="8" fill="#ff6b6b"/></svg>`},
-  {id:'stetho',name:'Estetoscópio',ic:`<svg viewBox="0 0 100 100"><path d="M30 12 v26 a20 20 0 0 0 40 0 V12" stroke="#4a5568" stroke-width="6" fill="none"/><path d="M50 58 v12 a14 14 0 0 0 28 0 v-6" stroke="#4a5568" stroke-width="6" fill="none"/><circle cx="78" cy="58" r="11" fill="#9aa5b8" stroke="#4a5568" stroke-width="4"/><circle cx="30" cy="12" r="5" fill="#4a5568"/><circle cx="70" cy="12" r="5" fill="#4a5568"/></svg>`}
+  {id:'ultra',name:'Ultrassom',ic:`<svg viewBox="0 0 100 100"><rect x="8" y="12" width="84" height="62" rx="10" fill="#222"/><path d="M50 18 L80 66 H20Z" fill="#555"/><ellipse cx="50" cy="50" rx="12" ry="9" fill="#ccc"/><circle cx="44" cy="46" r="5" fill="#ddd"/><rect x="40" y="78" width="20" height="14" rx="4" fill="#9aa5b8"/></svg>`},
+  {id:'scale',name:'Balança e régua',ic:`<svg viewBox="0 0 100 100"><rect x="70" y="8" width="20" height="84" rx="4" fill="#ffd43b" stroke="#e0a800" stroke-width="2"/><path d="M70 20 h8 M70 32 h12 M70 44 h8 M70 56 h12 M70 68 h8 M70 80 h12" stroke="#7a5b00" stroke-width="2"/><rect x="6" y="54" width="58" height="36" rx="10" fill="#e9ecef" stroke="#868e96" stroke-width="3"/><rect x="20" y="62" width="30" height="12" rx="3" fill="#cfe8c8"/></svg>`},
+  {id:'cur',name:'Adesivos e curativos',ic:`<svg viewBox="0 0 100 100"><rect x="8" y="36" width="84" height="30" rx="15" fill="#ffc9a8" transform="rotate(-30 50 50)"/><rect x="36" y="36" width="28" height="30" rx="4" fill="#fff3ea" transform="rotate(-30 50 50)"/></svg>`}
 ];
+const TOOL_OPEN={xray:()=>openXray(),thermo:()=>openThermo(),bp:()=>openBP(),stetho:()=>openStetho(),oto:()=>openOto(),lupa:()=>openLupa(),ultra:()=>openUltra(),scale:()=>openScale(),cur:()=>openCur()};
+function openTool(id){click();TOOL_OPEN[id]()}
 function renderTools(){
   const p=S.p;
   $('#tools').innerHTML=TOOLS.map(t=>{
-    const locked=t.id==='bp'&&(p.kind==='pet'||p.age<30);
-    const why=p.kind==='pet'?'Só para pessoas':'Só para quem tem 30 anos ou mais';
-    return `<button class="tool ${S.done[t.id]?'done':''} ${locked?'locked':''}" onclick="${locked?`lockedTool('${why}')`:`openTool('${t.id}')`}">${t.ic}${t.name}${locked?`<span class="lk">🔒 ${why}</span>`:''}</button>`}).join('');
+    const locked=t.id==='bp'&&(p.kind!=='pessoa'||p.age<30);
+    const why=p.kind!=='pessoa'?'Só para pessoas':'Só para quem tem 30 anos ou mais';
+    return `<button class="tool ${S.done[t.id]?'done':''} ${locked?'locked':''}" data-tool="${t.id}" onclick="${locked?`lockedTool('${why}')`:`openTool('${t.id}')`}">${t.ic}${t.name}${locked?`<span class="lk">🔒 ${why}</span>`:''}</button>`}).join('');
 }
-function lockedTool(why){oops();say('A pressão é medida '+why.toLowerCase().replace('só ','só ')+'.')}
-
-/* ============ OVERLAY ============ */
+function lockedTool(why){oops();say('A pressão é medida '+why.toLowerCase()+'.')}
 function openPanel(title,html){$('#panel').innerHTML=`<div class="ph"><h2>${title}</h2><button class="iconbtn" onclick="closeTool()" aria-label="Fechar">✕</button></div>${html}`;$('#overlay').classList.add('on')}
-function closeTool(){stopAudio();stopCam();clearLater();S.torch=false;cancelAnimationFrame(window._raf);clearInterval(window._ti);$('#overlay').classList.remove('on')}
-const TOOL_OPEN={xray:()=>openXray(),thermo:()=>openThermo(),bp:()=>openBP(),stetho:()=>openStetho()};
-function openTool(id){click();TOOL_OPEN[id]()}
+function closeTool(){stopAudio();stopCam();clearLater();S.torch=false;cancelAnimationFrame(window._raf);clearInterval(window._ti);clearInterval(window._hb);clearInterval(window._st);$('#overlay').classList.remove('on')}
+function svgPt(svg,e){const pt=svg.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;const m=svg.getScreenCTM();return m?pt.matrixTransform(m.inverse()):{x:0,y:0}}
+function found(key,html,bad,speech){if(S.found[key])return false;S.found[key]=1;addNote(key,html);if(speech)say(speech);if(bad)oops();else{tone(880,.15,'sine',.12);tone(1320,.2,'sine',.12,.15)}return true}
 
-/* ---- RAIO-X ---- */
+/* ---- RAIO-X com scanner no dedo ---- */
+function xrayModel(p){
+  const sp=spOf(p),x=p.f.xray;
+  if(sp==='pessoa'){
+    const {k,sw}=humanParts(p);const T=`translate(100 440) scale(${k}) translate(-100 -440)`,tr=(a,b)=>[100+(a-100)*k,440+(b-440)*k];
+    let fx=null;if(x&&x.t==='fratura')fx=x.w==='perna'?[78,326]:[100-sw-5,146];if(x&&x.t==='objeto')fx=[100,236];
+    return {vb:'0 0 200 440',W:200,H:440,R:52,sil:humanSilhouette(p),sk:humanSkeleton(p),T,fx,fxs:fx?tr(...fx):null};
+  }
+  const k=p.age<=1&&sp!=='galinha'?.8:1;const T=`translate(200 236) scale(${k}) translate(-200 -236)`,tr=(a,b)=>[200+(a-200)*k,236+(b-236)*k];
+  let sil,sk,fx=null;
+  if(sp==='cachorro'||sp==='gato'){sil=petSilhouette(p);sk=petSkeleton(p);if(x&&x.t==='fratura')fx=[135,194];if(x&&x.t==='objeto')fx=[210,132]}
+  else if(sp==='capivara'){sil=genericSilhouette(p);sk=capiSkeleton(p);if(x&&x.t==='fratura')fx=[135,182];if(x&&x.t==='objeto')fx=[210,140]}
+  else if(sp==='galinha'){sil=genericSilhouette(p);sk=chickSkeleton(p);if(x&&x.t==='fratura')fx=[236,110];if(x&&x.t==='objeto')fx=[210,140]}
+  else{sil=genericSilhouette(p);sk=plushInside(p);if(x&&x.t==='objeto')fx=[200,150];if(x&&x.t==='enchimento')fx=[250,170]}
+  return {vb:'0 0 400 260',W:400,H:260,R:56,sil,sk,T:sp==='galinha'||kindOf(sp)==='pelucia'?'':T,fx,fxs:fx?(sp==='galinha'||kindOf(sp)==='pelucia'?fx:tr(...fx)):null};
+}
+function xrayFindSVG(p,m){
+  if(!m.fx)return '';const [x,y]=m.fx,t=p.f.xray.t;
+  if(t==='fratura')return `<g transform="${m.T}"><circle cx="${x}" cy="${y}" r="20" fill="none" stroke="#ff3b55" stroke-width="4" class="pulse"/><path d="M${x-10} ${y-4} l6 3 l-4 4 l7 2 l-3 4 l8 1" stroke="#ff3b55" stroke-width="3.5" fill="none" stroke-linejoin="round"/></g>`;
+  if(t==='objeto')return `<g transform="${m.T}"><circle cx="${x}" cy="${y}" r="13" fill="#ffffff" stroke="#ffd43b" stroke-width="3"/><circle cx="${x-4}" cy="${y-4}" r="2.5" fill="#0a1a28"/><circle cx="${x+4}" cy="${y-4}" r="2.5" fill="#0a1a28"/><circle cx="${x-4}" cy="${y+4}" r="2.5" fill="#0a1a28"/><circle cx="${x+4}" cy="${y+4}" r="2.5" fill="#0a1a28"/><circle cx="${x}" cy="${y}" r="22" fill="none" stroke="#ff3b55" stroke-width="3" class="pulse"/></g>`;
+  return `<g><ellipse cx="${x}" cy="${y}" rx="34" ry="24" fill="#050d16" stroke="#ff3b55" stroke-width="3" stroke-dasharray="6 4"/><path d="M${x-30} ${y} l10 -6 l8 8 l10 -8 l10 8 l10 -6" stroke="#ff3b55" stroke-width="3" fill="none" class="pulse"/></g>`;
+}
 function openXray(){
-  const p=S.p,pet=p.kind==='pet';
-  const vb=pet?'0 0 400 260':'0 0 200 440',H=pet?260:440,W=pet?400:200;
-  const sil=pet?petSilhouette(p):humanSilhouette(p);
-  const sk=pet?petSkeleton(p):humanSkeleton(p);
-  const fr=p.cond==='fratura'?(pet?petFracture(p):humanFracture(p)):'';
+  const p=S.p,m=xrayModel(p);S.xm=m;S.xdist=0;
   openPanel('Raio-X',`
-   <div class="xray" id="xbox"><video id="xvid" class="xcam hidden" playsinline muted autoplay></video><div class="xtint"></div><span class="xtag">RAIO-X • ${esc(p.name.toUpperCase())} • ${sexWord(p).toUpperCase()}</span>
-    <svg viewBox="${vb}" id="xsvg">
-     <defs><clipPath id="xclip"><rect id="xcr" x="0" y="0" width="${W}" height="0"/></clipPath>
-       <filter id="glow"><feGaussianBlur stdDeviation="2.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-       <linearGradient id="scang" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5ff" stop-opacity="0"/><stop offset=".85" stop-color="#5ff" stop-opacity=".45"/><stop offset="1" stop-color="#fff" stop-opacity="1"/></linearGradient></defs>
-     <g id="xsil">${sil}</g>
-     <g clip-path="url(#xclip)" filter="url(#glow)">${sk}</g>
-     <g id="xfr" opacity="0">${fr}</g>
-     <rect id="xbar" x="0" y="-40" width="${W}" height="40" fill="url(#scang)" opacity="0"/>
+   <div class="xray" id="xbox"><video id="xvid" class="xcam hidden" playsinline muted autoplay></video><div class="xtint"></div><span class="xtag">RAIO-X • ${esc(p.name.toUpperCase())}</span>
+    <svg viewBox="${m.vb}" id="xsvg" style="touch-action:none">
+     <defs><clipPath id="xclip"><circle id="xlens" cx="-200" cy="-200" r="${m.R}"/></clipPath>
+       <filter id="glow"><feGaussianBlur stdDeviation="2.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+     <g id="xsil">${m.sil}</g>
+     <g clip-path="url(#xclip)" filter="url(#glow)"><rect width="${m.W}" height="${m.H}" fill="rgba(5,13,22,.55)"/>${m.sk}${xrayFindSVG(p,m)}</g>
+     <circle id="xring" cx="-200" cy="-200" r="${m.R}" fill="none" stroke="#8fe4ff" stroke-width="3" stroke-dasharray="8 6"/>
     </svg></div>
-   <button class="redbtn" id="xbtn" onclick="runXray()">RAIO-X</button>
-   <div class="center" style="margin-top:10px"><button class="camtoggle hidden" id="xcamb" onclick="xrayCam()">📷 Usar a câmera do tablet</button></div>
-   <div class="result" id="xres">Aperte o botão vermelho para escanear!</div>`);
+   <div class="row" style="justify-content:center;margin-top:10px"><button class="camtoggle" onclick="xrayAll()">🔎 Ver tudo</button><button class="camtoggle hidden" id="xcamb" onclick="xrayCam()">📷 Usar a câmera do tablet</button></div>
+   <div class="result" id="xres">Passe o dedo no corpo para escanear!</div>`);
   if(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia){$('#xcamb').classList.remove('hidden');xrayCam(true)}
-  say('Aponte o tablet para o paciente e aperte o botão vermelho!');
+  const sv=$('#xsvg');let down=false,last=null;
+  const mv=e=>{const pt=svgPt(sv,e);$('#xlens').setAttribute('cx',pt.x);$('#xlens').setAttribute('cy',pt.y);$('#xring').setAttribute('cx',pt.x);$('#xring').setAttribute('cy',pt.y);
+    if(last)S.xdist+=Math.hypot(pt.x-last.x,pt.y-last.y);last=pt;
+    if(Math.random()<.08)tone(rnd(300,500),.05,'sine',.04);xrayCheck(pt)};
+  sv.addEventListener('pointerdown',e=>{down=true;last=null;try{sv.setPointerCapture(e.pointerId)}catch(_){}$('#xbox').classList.add('xon');mv(e);e.preventDefault()});
+  sv.addEventListener('pointermove',e=>{if(down)mv(e)});
+  const up=()=>{down=false};sv.addEventListener('pointerup',up);sv.addEventListener('pointercancel',up);
+  say('Passe o dedo no corpo do paciente para escanear!');
+}
+function xrayCheck(pt){
+  const p=S.p,m=S.xm;
+  if(m.fxs&&Math.hypot(pt.x-m.fxs[0],pt.y-m.fxs[1])<m.R*.75)xrayResult();
+  else if(!m.fxs&&S.xdist>(m.W+m.H)*2.2)xrayResult();
+}
+function xrayAll(){click();const l=$('#xlens');if(!l)return;l.setAttribute('cx',S.xm.W/2);l.setAttribute('cy',S.xm.H/2);l.setAttribute('r',Math.max(S.xm.W,S.xm.H));$('#xring').setAttribute('cx',-500);$('#xbox').classList.add('xon');xrayResult()}
+function xrayResult(){
+  const p=S.p,x=p.f.xray,pl=p.kind==='pelucia';
+  if(x&&x.t==='fratura'){const onde={braco:'no braço',perna:'na perna',pata:'na patinha',asa:'na asinha'}[x.w];found('xray',`Raio-X: <b class="bad">osso quebrado ${onde}</b>`,1,'Achei! Tem um osso quebrado '+onde+'!');$('#xres').innerHTML=`<span class="bad">Achei! Osso quebrado ${onde}.</span>`}
+  else if(x&&x.t==='objeto'){found('xray','Raio-X: <b class="bad">tem um botão na barriga!</b>',1,'Olha! Tem um botão dentro da barriga!');$('#xres').innerHTML='<span class="bad">Tem um botão dentro da barriga!</span>'}
+  else if(x&&x.t==='enchimento'){found('xray','Raio-X: <b class="bad">está faltando algodão</b>',1,'Está faltando algodão aqui dentro!');$('#xres').innerHTML='<span class="bad">Está faltando algodão!</span>'}
+  else{found('xray',`Raio-X: <b class="ok">${pl?'algodão fofinho':'ossos normais'}</b>`,0,pl?'Só tem algodão fofinho aqui dentro!':'Os ossos estão fortes e certinhos!');$('#xres').innerHTML=`<span class="ok">${pl?'Só algodão fofinho!':'Ossos fortes e certinhos!'}</span>`}
 }
 async function xrayCam(auto){
   if(camStream&&!auto){stopCam();$('#xbox').classList.remove('cam','xon');$('#xcamb').textContent='📷 Usar a câmera do tablet';return}
-  const ok=await camOn('#xvid');
+  const ok=await camOn('#xvid');if(!$('#xbox'))return;
   if(ok){$('#xbox').classList.add('cam');$('#xcamb').textContent='🖼️ Usar o desenho'}
   else if(!auto){$('#xcamb').textContent='A câmera não abriu aqui';$('#xcamb').disabled=true}
 }
-function runXray(){
-  const p=S.p,pet=p.kind==='pet',H=pet?260:440;
-  $('#xbtn').disabled=true;$('#xres').innerHTML='<span class="pulse">Escaneando...</span>';
-  $('#xcr').setAttribute('height',0);$('#xfr').setAttribute('opacity',0);
-  const xb=$('#xbox');xb.classList.remove('xon');void xb.offsetWidth;xb.classList.add('xon');
-  const a=ac();if(a){tone(110,2.8,'sawtooth',.09);tone(400,2.8,'sine',.09,0,1200)}
-  const bar=$('#xbar');bar.setAttribute('opacity',1);
-  const t0=performance.now(),D=2800;
-  const step=now=>{const t=Math.min(1,(now-t0)/D);const y=t*H;
-    $('#xcr').setAttribute('height',y);bar.setAttribute('y',y-40);
-    if(t<1)window._raf=requestAnimationFrame(step);else done()};
-  window._raf=requestAnimationFrame(step);
-  function done(){
-    bar.setAttribute('opacity',0);$('#xbtn').disabled=false;$('#xbtn').textContent='DE NOVO';
-    if(p.cond==='fratura'){
-      $('#xfr').setAttribute('opacity',1);oops();
-      const onde=pet?'na patinha da frente':'no braço';
-      $('#xres').innerHTML=`<span class="bad">Encontrei! Tem um osso quebrado ${onde}.</span>`;
-      say('Encontrei! Tem um osso quebrado '+onde+'.');
-      addNote('xray',`Raio-X: <b class="bad">osso quebrado ${onde}</b>`);
-    }else{
-      tone(880,.15,'sine',.12);tone(1320,.2,'sine',.12,.15);
-      $('#xres').innerHTML=`<span class="ok">Os ossos estão fortes e certinhos!</span>`;
-      say('Os ossos estão fortes e certinhos!');
-      addNote('xray',`Raio-X: <b class="ok">ossos normais</b>`);
+
+/* ---- ESTETOSCOPIO quente-frio ---- */
+function openStetho(){
+  const p=S.p,[W,H]=avVB(p),a=anchors(p);S.st={x:-99,y:-99,down:false,a};
+  openPanel('Estetoscópio',`<div class="stwrap"><svg viewBox="0 0 ${W} ${H}" id="stsvg" style="touch-action:none;height:min(50vh,440px);max-width:100%">${avInner(avatar(p,{sad:p.caseId!=='vacina'}))}
+     <g id="sthead" transform="translate(-99 -99)"><circle r="${W*.07}" fill="#9aa5b8" stroke="#4a5568" stroke-width="4"/><circle r="${W*.04}" fill="#dfe6f0"/></g></svg></div>
+   <div class="heatbar"><span>❄️</span><div class="hb"><div id="heat"></div></div><span>❤️</span></div>
+   <div class="result" id="stres">Arraste o estetoscópio pelo corpo e procure o coração!</div>`);
+  const sv=$('#stsvg');
+  const mv=e=>{const pt=svgPt(sv,e);S.st.x=pt.x;S.st.y=pt.y;$("#sthead").setAttribute("transform",`translate(${pt.x} ${pt.y})`)};
+  sv.addEventListener('pointerdown',e=>{S.st.down=true;try{sv.setPointerCapture(e.pointerId)}catch(_){}mv(e);e.preventDefault();ac()});
+  sv.addEventListener('pointermove',e=>{if(S.st.down)mv(e)});
+  const up=()=>{S.st.down=false};sv.addEventListener('pointerup',up);sv.addEventListener('pointercancel',up);
+  let lastBeat=0,lastZone=0;
+  window._st=setInterval(()=>{
+    if(!S.st.down||!$('#stsvg'))return;const now=performance.now(),p=S.p,a=S.st.a,W=avVB(p)[0];
+    const dh=Math.hypot(S.st.x-a.heart[0],S.st.y-a.heart[1]),reach=W*.55,v=Math.max(0,1-dh/reach);
+    $('#heat').style.width=Math.round(v*100)+'%';
+    if(v>0.05&&now-lastBeat>60000/p.bpm){lastBeat=now;if(p.kind==='pelucia'){tone(1046,.12,'triangle',.15*v+.02);tone(1318,.15,'triangle',.12*v+.02,.16)}else heartBeat(.25+v*.85)}
+    if(now-lastZone>1500){
+      const dl=Math.hypot(S.st.x-a.lung[0],S.st.y-a.lung[1]),db=Math.hypot(S.st.x-a.belly[0],S.st.y-a.belly[1]),R=W*.09;
+      if(dl<R&&dl<dh){lastZone=now;breath(!!p.f.chiado&&p.kind!=='pelucia');stethoNote('lung')}
+      else if(db<R){lastZone=now;if(p.kind==='pelucia'){if(p.f.xray&&p.f.xray.t==='objeto'){tone(1800,.04,'square',.12);tone(1600,.04,'square',.12,.15)}}else bellySound(p.f.barriga==='forte'?true:p.f.barriga==='leve'?'leve':false);stethoNote('belly')}
     }
-  }
+    if(dh<W*.08)stethoNote('heart');
+  },60);
+  say('Arraste o estetoscópio e procure o coração! Quanto mais perto, mais forte ele bate.');
+}
+function breath(wheeze){noise(.9,500,.6,.18,0,'bandpass',900);noise(1.1,380,.6,.14,1,'bandpass',600);if(wheeze){tone(760,.8,'sine',.06,0,900);tone(820,.9,'sine',.05,1.05,700)}}
+function stethoNote(z){
+  const p=S.p,pl=p.kind==='pelucia';
+  if(z==='heart'){const fast=!!(p.f.rapido||p.f.febre)&&!pl;
+    if(found('heart',pl?'Coração: <b class="ok">coração de algodão, plim plim!</b>':`Coração: ${p.bpm} batidas por minuto, `+(fast?'<b class="bad">acelerado</b>':'<b class="ok">normal</b>'),fast,pl?'Achei o coração de algodão!':fast?'Achei o coração! Está bem acelerado.':'Achei o coração! Batendo certinho.')){$('#stres').innerHTML=pl?'<span class="ok">Coração de algodão: plim plim!</span>':`${p.bpm} batidas por minuto: `+(fast?'<span class="bad">acelerado!</span>':'<span class="ok">batendo certinho!</span>');S.done.stetho=true;renderTools()}}
+  if(z==='lung'){const w=!!p.f.chiado&&!pl;if(found('lung','Pulmão: '+(w?'<b class="bad">chiado</b>':'<b class="ok">respirando bem</b>'),w,w?'Escutei um chiado no pulmão!':'O pulmão está respirando bem.'))$('#stres').innerHTML=w?'<span class="bad">Chiado no pulmão!</span>':'<span class="ok">Pulmão respirando bem.</span>'}
+  if(z==='belly'){const b=p.f.barriga,obj=pl&&p.f.xray&&p.f.xray.t==='objeto';const bad=!!b||obj;const txt=obj?'barulho de chocalho!':b==='forte'?'muito barulho, dolorida':b==='leve'?'um barulhinho estranho':'calminha';
+    if(found('belly','Barriga: <b class="'+(bad?'bad':'ok')+'">'+txt+'</b>',bad,'A barriga está '+(obj?'fazendo barulho de chocalho!':b==='forte'?'fazendo muito barulho!':b==='leve'?'com um barulhinho estranho.':'calminha.')))$('#stres').innerHTML=`<span class="${bad?'bad':'ok'}">Barriga: ${txt}</span>`}
 }
 
 /* ---- TERMOMETRO ---- */
-let camStream=null;
 function openThermo(){
   const p=S.p,canCam=!!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia);
   openPanel('Termômetro digital',`
-   <div class="camview" id="camview">
-     <div class="face" id="tface">${pic(p,{sad:p.cond!=='saudavel'})}</div>
+   <div class="camview" id="camview"><div class="face" id="tface">${pic(p,{sad:p.caseId!=='vacina'})}</div>
      <video id="camvid" playsinline muted autoplay class="hidden"></video>
-     <svg class="cross" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="#fff" stroke-width="4" stroke-dasharray="14 10"/><path d="M50 0 v22 M50 78 v22 M0 50 h22 M78 50 h22" stroke="#fff" stroke-width="4"/><circle cx="50" cy="50" r="40" fill="none" stroke="#ff2d4a" stroke-width="2" stroke-dasharray="14 10"/></svg>
-     <div class="laser" id="laser"></div>
-     <div class="hud" id="hud">Aponte para a testa ${p.kind==='pet'?'(ou a orelha) ':''}e aperte MEDIR</div>
-   </div>
-   <div class="gun">
-     <div class="lcd" id="lcd">--,- °C</div>
-     <button class="redbtn" style="margin:0;width:110px;height:110px" id="tbtn" onclick="runThermo()">MEDIR</button>
-     ${canCam?`<button class="camtoggle" onclick="toggleCam()" id="camb">📷 Usar a câmera do tablet</button>`:''}
-   </div>
+     <svg class="cross" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="#fff" stroke-width="4" stroke-dasharray="14 10"/><path d="M50 0 v22 M50 78 v22 M0 50 h22 M78 50 h22" stroke="#fff" stroke-width="4"/></svg>
+     <div class="laser" id="laser"></div><div class="hud" id="hud">Aponte para a testa e aperte MEDIR</div></div>
+   <div class="gun"><div class="lcd" id="lcd">--,- °C</div><button class="redbtn" style="margin:0;width:110px;height:110px" id="tbtn" onclick="runThermo()">MEDIR</button>
+     ${canCam?`<button class="camtoggle" onclick="toggleCam()" id="camb">📷 Usar a câmera do tablet</button>`:''}</div>
    <div class="result" id="tres"></div>`);
   if(canCam)toggleCam(true);
   say('Aponte o termômetro para a testa e aperte medir!');
 }
+function runThermo(){
+  const p=S.p,target=Math.round(p.temp*10)/10;
+  $('#tbtn').disabled=true;$('#laser').classList.add('on');$('#tres').textContent='';
+  const lcd=$('#lcd');lcd.className='lcd';let v=target-4;const steps=26,inc=(target-v)/steps;let i=0;
+  window._ti=setInterval(()=>{i++;v+=inc;lcd.textContent=fmt(i>=steps?target:v)+' °C';tone(1500+i*20,.03,'square',.04);if(i>=steps){clearInterval(window._ti);fin()}},90);
+  function fin(){
+    $('#laser').classList.remove('on');$('#tbtn').disabled=false;const fever=!!p.f.febre;
+    lcd.classList.add(fever?'hot':'okc');S.visit.temp=target;tone(fever?880:2000,.5,'square',.08);if(fever)tone(880,.5,'square',.08,.6);
+    $('#tres').innerHTML=`<span class="${fever?'bad':'ok'}">${fmt(target)} °C: ${fever?'está com febre!':'temperatura normal!'}</span><div style="font-size:17px;font-weight:500;margin-top:4px">${p.tempRef}</div>`;
+    S.found.thermo=0;found('thermo',`Temperatura: <b class="${fever?'bad':'ok'}">${fmt(target)} °C, ${fever?'febre':'normal'}</b>`,0,`${fmt(target)} graus. ${fever?'Está com febre!':'Temperatura normal!'}`);
+  }
+}
+
+/* ---- OTOSCOPIO (ouvido, boca, olho) ---- */
+function mouthSVG(p,find){
+  const c=find==='carie',g=find==='garganta';
+  let t=`<rect width="200" height="200" fill="#7a1f2b"/><ellipse cx="100" cy="112" rx="40" ry="44" fill="${g?'#c2253b':'#4a0f18'}"/>`;
+  if(g)t+=`<ellipse cx="62" cy="112" rx="14" ry="24" fill="#ff3b4e"/><ellipse cx="138" cy="112" rx="14" ry="24" fill="#ff3b4e"/><g fill="#fff8e1"><circle cx="58" cy="106" r="3"/><circle cx="142" cy="108" r="3"/></g>`;
+  else t+=`<ellipse cx="62" cy="112" rx="13" ry="22" fill="#e98a8a"/><ellipse cx="138" cy="112" rx="13" ry="22" fill="#e98a8a"/>`;
+  t+=`<path d="M0 0 H200 V40 Q100 70 0 40Z" fill="#f4a3a8"/>`;for(let i=0;i<7;i++)t+=`<rect x="${20+i*23}" y="${30+Math.abs(3-i)*3}" width="20" height="26" rx="6" fill="#fffdf5" stroke="#ddd"/>`;
+  t+=`<path d="M0 200 H200 V160 Q100 130 0 160Z" fill="#f4a3a8"/>`;for(let i=0;i<7;i++)t+=`<rect x="${20+i*23}" y="${146-Math.abs(3-i)*3}" width="20" height="24" rx="6" fill="#fffdf5" stroke="#ddd"/>`;
+  if(c)t+=`<circle cx="74" cy="44" r="6" fill="#6b4a1f"/><circle cx="142" cy="158" r="5" fill="#6b4a1f"/>`;
+  t+=`<path d="M60 186 Q100 150 140 186Z" fill="#ff8fa3"/>`;return t;
+}
+function eyeSVG(p,find){
+  const pl=p.kind==='pelucia';
+  if(pl)return `<rect width="200" height="200" fill="${p.look.fur}"/><circle cx="${find==='solto'?120:100}" cy="${find==='solto'?130:100}" r="38" fill="#1f1f2a"/><circle cx="${find==='solto'?108:88}" cy="${find==='solto'?118:88}" r="10" fill="#fff"/>${find==='solto'?'<path d="M100 100 Q110 110 116 96" stroke="#222" stroke-width="3" fill="none"/><circle cx="100" cy="100" r="12" fill="'+shade(p.look.fur)+'"/>':''}`;
+  const ci=find==='cisco';
+  return `<rect width="200" height="200" fill="#f2c6a8"/><ellipse cx="100" cy="100" rx="86" ry="56" fill="${ci?'#ffe3e3':'#fff'}" stroke="#c98e66" stroke-width="4"/>${ci?'<path d="M24 96 q20 -6 34 4 M176 104 q-20 8 -34 -2 M40 130 q16 -10 30 -2" stroke="#ff6b6b" stroke-width="2" fill="none"/>':''}<circle cx="100" cy="100" r="40" fill="#6aa0d8"/><circle cx="100" cy="100" r="18" fill="#111"/><circle cx="88" cy="88" r="8" fill="#fff" opacity=".8"/>${ci?'<path d="M128 74 l6 -3 l2 5 l-5 4Z" fill="#5a4630"/><circle cx="131" cy="76" r="9" fill="none" stroke="#ff3b55" stroke-width="2" class="pulse"/>':''}`;
+}
+function openOto(){
+  S.otoPart='ouvido';
+  openPanel('Otoscópio',`<div class="otowrap">
+    <div class="seg" id="otoSeg"><button class="choice sel" data-v="ouvido" onclick="otoPart('ouvido')">👂 Ouvido</button><button class="choice" data-v="boca" onclick="otoPart('boca')">👄 Boca</button><button class="choice" data-v="olho" onclick="otoPart('olho')">👁️ Olho</button></div>
+    <div class="otoview" id="otoview"><video id="otovid" playsinline muted autoplay class="hidden"></video><svg id="otosvg" viewBox="0 0 200 200"></svg><svg id="otofind" viewBox="0 0 200 200"></svg><div class="flash"></div></div>
+    <div class="row" style="justify-content:center"><button class="redbtn" style="margin:0" id="otobtn" onclick="runOto()">OLHAR</button>
+      <button class="camtoggle hidden" id="torchb" onclick="toggleTorch()">💡 Lanterna</button><button class="camtoggle hidden" id="otocamb" onclick="otoCam()">📷 Usar o desenho</button></div>
+    <div class="result" id="otores"></div></div>`);
+  otoPart('ouvido',true);
+  if(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia)otoCam(true);
+  say('Escolha onde olhar, encoste pertinho e aperte olhar!');
+}
+function otoPart(v,silent){
+  if(!silent)click();S.otoPart=v;setSel('#otoSeg',v);$('#otofind').innerHTML='';
+  $('#otosvg').innerHTML=v==='ouvido'?EAR_SVG:v==='boca'?mouthSVG(S.p,null):eyeSVG(S.p,null);
+  $('#otores').textContent={ouvido:'Encoste pertinho do ouvido e aperte OLHAR.',boca:'Peça para abrir bem a boca e falar AAAA!',olho:'Peça para olhar para cima e aperte OLHAR.'}[v];
+  if(!silent)say({ouvido:'Vamos olhar dentro do ouvido!',boca:'Abre bem a boca e fala aaaaaa!',olho:'Olha para cima, bem paradinho!'}[v]);
+}
+function runOto(){
+  const p=S.p,part=S.otoPart,v=$('#otoview'),o=p.f.oto||{},fd=o[part]||null,cam=!!camStream;
+  $('#otobtn').disabled=true;v.classList.add('lit');tone(1200,.05,'square',.05);
+  if(cam&&!$('#torchb').classList.contains('hidden'))toggleTorch(true);
+  $('#otores').innerHTML='<span class="pulse">Olhando...</span>';
+  later(()=>{
+    if(!$('#otoview'))return;v.classList.remove('lit');$('#otobtn').disabled=false;
+    let html='',txt,bad=!!fd;
+    if(part==='ouvido'){
+      if(fd==='cera'){html='<g fill="#c99a2e" opacity=".92"><circle cx="78" cy="122" r="12"/><circle cx="92" cy="132" r="8"/><circle cx="126" cy="84" r="10"/><circle cx="118" cy="76" r="6"/><circle cx="110" cy="128" r="7"/></g>';txt='O ouvido está cheio de cera! Precisa limpar.'}
+      else if(fd==='vermelho'){html='<rect width="200" height="200" fill="rgba(255,0,40,.32)"/>';txt='O ouvido está vermelho e inflamado!'}
+      else txt=p.kind==='pelucia'?'Orelha de pelúcia limpinha!':'O ouvido está limpinho!';
+    }else if(part==='boca'){
+      if(!cam)$('#otosvg').innerHTML=mouthSVG(p,fd);
+      if(cam&&fd)html=fd==='garganta'?'<rect width="200" height="200" fill="rgba(255,0,40,.3)"/>':'<g fill="#6b4a1f"><circle cx="74" cy="60" r="10"/><circle cx="130" cy="140" r="8"/></g>';
+      txt=fd==='garganta'?'A garganta está vermelha e inflamada!':fd==='carie'?'Achei uma cárie no dente!':p.kind==='pelucia'?'Boca de pelúcia, tudo certinho!':'Boca e dentes saudáveis!';
+    }else{
+      if(!cam)$('#otosvg').innerHTML=eyeSVG(p,fd);
+      if(cam&&fd)html='<path d="M120 70 l10 -5 l4 8 l-8 6Z" fill="#5a4630"/><circle cx="125" cy="72" r="14" fill="none" stroke="#ff3b55" stroke-width="3"/>';
+      txt=fd==='cisco'?'Tem um cisco no olho!':fd==='solto'?'O olho de botão está soltinho!':'O olho está limpinho!';
+    }
+    $('#otofind').innerHTML=html;$('#otores').innerHTML=`<span class="${bad?'bad':'ok'}">${txt}</span>`;
+    const lab={ouvido:'Ouvido',boca:'Boca',olho:'Olho'}[part];
+    S.found['oto-'+part]=0;found('oto-'+part,`${lab}: <b class="${bad?'bad':'ok'}">${txt.replace(/!$/,'')}</b>`,bad,txt);
+  },1500);
+}
+
+/* ---- LUPA ---- */
+function lupaFindSVG(p){
+  const L=p.f.lupa;if(!L)return {svg:'',pos:null};const a=anchors(p);const pos=a[L.w]||a.pele;const [x,y]=pos;const sc=spOf(p)==='pessoa'?.7:1;let s='';
+  const G=(inner)=>`<g transform="translate(${x} ${y}) scale(${sc})">${inner}</g>`;
+  switch(L.t){
+    case 'corte':s=G('<path d="M-12 -2 L12 2" stroke="#d6336c" stroke-width="4" stroke-linecap="round"/><circle cx="-14" cy="6" r="2" fill="#8a6a3a"/><circle cx="10" cy="-6" r="2" fill="#8a6a3a"/><circle cx="4" cy="8" r="1.6" fill="#8a6a3a"/>');break;
+    case 'espinho':s=G('<path d="M-3 4 L0 -12 L3 4Z" fill="#6b4a1f"/><circle r="9" fill="none" stroke="#ff6b6b" stroke-width="1.5" opacity=".6"/>');break;
+    case 'pulgas':s=G([[-14,-6],[-4,6],[8,-8],[14,6],[0,-2],[-10,10]].map(([a,b])=>`<ellipse cx="${a}" cy="${b}" rx="2.4" ry="1.6" fill="#3a2410"/>`).join(''));break;
+    case 'piolho':s=G([[-12,-4],[-2,6],[10,-6],[6,8],[-8,10]].map(([a,b])=>`<ellipse cx="${a}" cy="${b}" rx="2.2" ry="1.4" fill="#666"/>`).join(''));break;
+    case 'carrapato':s=G('<ellipse rx="6" ry="4.5" fill="#5a3a1a"/><path d="M-6 -2 l-4 -3 M-6 2 l-4 3 M6 -2 l4 -3 M6 2 l4 3 M-4 -4 l-2 -4 M4 -4 l2 -4" stroke="#3a2410" stroke-width="1.4"/>');break;
+    case 'alergia':s=G([[-10,-6],[-2,4],[8,-4],[12,8],[-12,8],[2,-10]].map(([a,b])=>`<circle cx="${a}" cy="${b}" r="3" fill="#ff6b6b" opacity=".85"/>`).join(''));break;
+    case 'rasgo':s=G('<path d="M-22 -4 l6 6 l6 -6 l6 6 l6 -6 l6 6 l6 -6" stroke="#5a3a2a" stroke-width="3" fill="none"/><circle cx="-4" cy="2" r="6" fill="#fff"/><circle cx="6" cy="0" r="5" fill="#fff"/>');break;
+    case 'olhoSolto':s=G('<path d="M0 0 Q6 8 10 16" stroke="#222" stroke-width="2" fill="none"/><circle cx="10" cy="18" r="7" fill="#1f1f2a"/>');break;
+    case 'sujeira':s=G([[-14,-6,8],[6,-10,6],[10,8,9],[-8,10,6]].map(([a,b,r])=>`<ellipse cx="${a}" cy="${b}" rx="${r}" ry="${r*.7}" fill="#7a5230" opacity=".75"/>`).join(''));break;
+    case 'unha':s=G('<path d="M-12 4 l-3 10 M-4 6 l-1 11 M4 6 l1 11 M12 4 l3 10" stroke="#f1f1f1" stroke-width="4" stroke-linecap="round"/><path d="M-12 4 l-3 10 M-4 6 l-1 11 M4 6 l1 11 M12 4 l3 10" stroke="#999" stroke-width="1" stroke-linecap="round"/>');break;
+  }
+  return {svg:s,pos};
+}
+function openLupa(){
+  const p=S.p,[W,H]=avVB(p),inner=avInner(avatar(p,{sad:p.caseId!=='vacina'})),F=lupaFindSVG(p),R=W*.16;
+  S.lu={pos:F.pos,dist:0,R};
+  openPanel('Lupa',`<div class="stwrap"><svg viewBox="0 0 ${W} ${H}" id="lusvg" style="touch-action:none;height:min(52vh,460px);max-width:100%">
+     <defs><clipPath id="luclip"><circle id="lucirc" cx="-200" cy="-200" r="${R}"/></clipPath></defs>
+     ${inner}<g opacity=".5">${F.svg}</g>
+     <g clip-path="url(#luclip)"><rect width="${W}" height="${H}" fill="#fff"/><g id="luzoom">${inner}${F.svg}</g></g>
+     <g id="luring" transform="translate(-200 -200)"><circle r="${R}" fill="none" stroke="#4a5568" stroke-width="${W*.025}"/><path d="M${R*.7} ${R*.7} L${R*1.5} ${R*1.5}" stroke="#4a5568" stroke-width="${W*.045}" stroke-linecap="round"/></g></svg></div>
+   <div class="result" id="lures">Passe a lupa pelo corpo e procure alguma coisa diferente!</div>`);
+  const sv=$('#lusvg');let down=false,last=null;
+  const mv=e=>{const pt=svgPt(sv,e);$('#lucirc').setAttribute('cx',pt.x);$('#lucirc').setAttribute('cy',pt.y);$('#luring').setAttribute('transform',`translate(${pt.x} ${pt.y})`);
+    $('#luzoom').setAttribute('transform',`translate(${pt.x} ${pt.y}) scale(2.2) translate(${-pt.x} ${-pt.y})`);
+    if(last)S.lu.dist+=Math.hypot(pt.x-last.x,pt.y-last.y);last=pt;lupaCheck(pt)};
+  sv.addEventListener('pointerdown',e=>{down=true;last=null;try{sv.setPointerCapture(e.pointerId)}catch(_){}mv(e);e.preventDefault()});
+  sv.addEventListener('pointermove',e=>{if(down)mv(e)});
+  const up=()=>{down=false};sv.addEventListener('pointerup',up);sv.addEventListener('pointercancel',up);
+  say('Passe a lupa pelo corpo e procure alguma coisa diferente!');
+}
+function lupaCheck(pt){
+  const p=S.p,L=p.f.lupa,W=avVB(p)[0];
+  if(L&&S.lu.pos&&Math.hypot(pt.x-S.lu.pos[0],pt.y-S.lu.pos[1])<S.lu.R*.6){
+    const t={corte:'um corte com sujeirinha',espinho:'um espinho espetado',pulgas:'pulgas no pelo',piolho:'piolhos',carrapato:'um carrapato',alergia:'bolinhas vermelhas de alergia',rasgo:'um rasgo na costura',olhoSolto:'o olho de botão soltando',sujeira:'muita sujeira',unha:'unhas compridas demais'}[L.t];
+    if(found('lupa',`Lupa: <b class="bad">${t}</b>`,1,'Achei! Tem '+t+'!'))$('#lures').innerHTML=`<span class="bad">Achei ${t}!</span>`;
+  }else if(!L&&S.lu.dist>W*6){const ok=p.kind==='pelucia'?'pelúcia limpinha e inteira':p.kind==='pessoa'?'pele saudável':'pelo bonito e limpinho';
+    if(found('lupa',`Lupa: <b class="ok">${ok}</b>`,0,'Tudo certo: '+ok+'!'))$('#lures').innerHTML=`<span class="ok">Tudo certo: ${ok}!</span>`}
+}
+
+/* ============ CENARIOS DOS TRATAMENTOS (400x300) ============ */
+const skinOf=p=>spOf(p)==='pessoa'?p.look.skin:spOf(p)==='galinha'?(p.look.fur==='#ffffff'?'#f1f3f5':p.look.fur):p.look.fur;
+function nest(svgStr,w,h){return svgStr.replace('<svg ',`<svg x="${-w/2}" y="${-h/2}" width="${w}" height="${h}" `)}
+const BG='<rect width="400" height="300" fill="#eef6ff"/>';
+function sceneFace(p,sad=true){const [W,H]=avVB(p),s=Math.min(360/W,280/H),ox=(400-W*s)/2,oy=(300-H*s)/2;
+  return {svg:`<g transform="translate(${ox} ${oy}) scale(${s})">${avInner(avatar(p,{sad}))}</g>`,map:pt=>[ox+pt[0]*s,oy+pt[1]*s],s}}
+function sceneArm(p){const c=skinOf(p),sp=spOf(p),dk=shade(c);let s=BG;
+  if(sp==='galinha')return BG+`<path d="M40 150 C80 60 260 50 340 110 C300 120 300 140 340 150 C300 160 300 180 336 196 C260 240 90 230 40 150Z" fill="${c}" stroke="${dk}" stroke-width="3"/>${[0,1,2,3].map(i=>`<path d="M${120+i*50} ${90+i*4} C${140+i*50} 140 ${140+i*50} 180 ${120+i*50} ${214-i*4}" stroke="${dk}" stroke-width="2" fill="none" opacity=".5"/>`).join('')}`;
+  if(sp==='pessoa')s+=`<rect x="-10" y="96" width="90" height="108" rx="20" fill="${p.look.shirt}"/>`;
+  s+=`<rect x="60" y="112" width="270" height="76" rx="38" fill="${c}"/>`;
+  if(sp==='pessoa')s+=`<circle cx="340" cy="150" r="42" fill="${c}"/>${[0,1,2,3].map(i=>`<rect x="${360}" y="${118+i*18}" width="34" height="14" rx="7" fill="${c}"/>`).join('')}<path d="M300 130 q20 -20 30 4" stroke="${c}" stroke-width="16" stroke-linecap="round" fill="none"/>`;
+  else s+=`<ellipse cx="340" cy="150" rx="46" ry="44" fill="${c}"/>${[[350,124],[366,146],[350,172]].map(([x,y])=>`<ellipse cx="${x}" cy="${y}" rx="9" ry="8" fill="${dk}"/>`).join('')}<ellipse cx="330" cy="150" rx="16" ry="20" fill="${dk}"/>`;
+  return s;}
+function sceneLeg(p){const c=skinOf(p);return BG+`<rect x="140" y="-10" width="120" height="70" rx="16" fill="${p.look.pants||'#3d5a80'}"/><rect x="160" y="30" width="80" height="230" rx="38" fill="${c}"/><ellipse cx="214" cy="270" rx="58" ry="26" fill="${c}"/>`}
+function sceneFoot(p){const c=skinOf(p),dk=shade(c);
+  if(spOf(p)==='pessoa')return BG+`<path d="M200 40 C270 40 290 120 280 190 C270 260 240 290 200 290 C160 290 130 260 120 190 C110 120 130 40 200 40Z" fill="${c}"/>${[[150,30,16],[180,18,18],[212,16,18],[242,24,16],[268,40,13]].map(([x,y,r])=>`<circle cx="${x}" cy="${y+20}" r="${r}" fill="${c}"/>`).join('')}<path d="M170 120 q30 20 60 0" stroke="${dk}" stroke-width="3" fill="none" opacity=".3"/>`;
+  return BG+`<rect width="400" height="300" fill="${c}"/><ellipse cx="200" cy="190" rx="70" ry="58" fill="${dk}"/>${[[110,100],[170,70],[230,70],[290,100]].map(([x,y])=>`<ellipse cx="${x}" cy="${y}" rx="30" ry="26" fill="${dk}"/>`).join('')}`}
+function sceneFur(p){const c=skinOf(p),dk=shade(c);let s=`<rect width="400" height="300" fill="${c}"/>`;for(let i=0;i<70;i++){const x=(i*53)%400,y=(i*37)%300;s+=`<path d="M${x} ${y} q6 10 2 22" stroke="${dk}" stroke-width="3" fill="none" opacity=".45" stroke-linecap="round"/>`}return s}
+function sceneHair(p){if(spOf(p)==='galinha'){const c=skinOf(p),dk=shade(c);let s=`<rect width="400" height="300" fill="${c}"/>`;for(let r=0;r<7;r++)for(let i=0;i<9;i++)s+=`<path d="M${i*50+(r%2)*25-10} ${r*46} q25 40 50 0" fill="${c}" stroke="${dk}" stroke-width="2"/>`;return s}
+  const c=spOf(p)==='pessoa'?p.look.hair:skinOf(p),dk=shade(c);let s=`<rect width="400" height="300" fill="${c}"/>`;for(let i=0;i<26;i++)s+=`<path d="M${i*16} 0 C${i*16+20} 80 ${i*16-20} 180 ${i*16+10} 300" stroke="${dk}" stroke-width="4" fill="none" opacity=".5"/>`;return s}
+const sceneEar=p=>`<rect width="400" height="300" fill="${skinOf(p)}"/><g transform="translate(50 0) scale(1.5)">${EAR_SVG}</g>`;
+const sceneMouth=p=>`<rect width="400" height="300" fill="#7a1f2b"/><g transform="translate(50 0) scale(1.5)">${mouthSVG(p,null)}</g>`;
+const sceneEye=p=>`<rect width="400" height="300" fill="#f2c6a8"/><g transform="translate(50 0) scale(1.5)">${eyeSVG(p,null)}</g>`;
+function sceneBelly(p){const c=skinOf(p);return BG+`<path d="M110 20 C110 0 290 0 290 20 L320 280 L80 280Z" fill="${c}" opacity=".9"/><path d="M200 30 C200 80 170 100 190 140 C210 170 160 190 200 215" stroke="#ffb3c1" stroke-width="22" fill="none" stroke-linecap="round"/><path d="M170 210 C150 250 230 270 250 230 C270 200 230 190 200 205Z" fill="#ffb3c1"/><text x="200" y="18" font-size="14" text-anchor="middle" font-family="Fredoka" fill="#22314a">boca</text>`}
+const BELLY_PATH=[[200,40],[198,62],[190,84],[180,104],[184,124],[198,144],[206,162],[192,182],[200,200],[218,226]];
+function sceneRoom(){return `<rect width="400" height="300" fill="#fff4e6"/><rect y="220" width="400" height="80" fill="#e8c99a"/><rect x="40" y="40" width="100" height="80" rx="6" fill="#bfe3ff" stroke="#fff" stroke-width="6"/><path d="M90 40 v80 M40 80 h100" stroke="#fff" stroke-width="4"/><rect x="180" y="150" width="190" height="80" rx="20" fill="#7c9cf5"/><rect x="170" y="130" width="40" height="100" rx="14" fill="#6a8ae8"/><rect x="340" y="130" width="40" height="100" rx="14" fill="#6a8ae8"/><ellipse cx="200" cy="270" rx="120" ry="16" fill="#ffd8a8"/>`}
+const ALERGENOS=[
+  {x:300,y:110,svg:`<rect x="-10" y="0" width="20" height="26" rx="4" fill="#4dabf7"/>${[[-14,-14],[0,-22],[14,-14],[-6,-6],[8,-4]].map(([a,b])=>`<circle cx="${a}" cy="${b}" r="7" fill="#ffd43b"/><circle cx="${a}" cy="${b}" r="3" fill="#f08c00"/>`).join('')}`},
+  {x:80,y:250,svg:`<ellipse rx="22" ry="12" fill="#adb5bd"/><circle cx="-8" cy="-6" r="8" fill="#ced4da"/><circle cx="8" cy="-4" r="7" fill="#ced4da"/><circle cx="-6" cy="-2" r="2" fill="#333"/><circle cx="4" cy="-2" r="2" fill="#333"/>`},
+  {x:330,y:255,svg:`<ellipse rx="18" ry="10" fill="#adb5bd"/><circle cx="-6" cy="-5" r="7" fill="#ced4da"/><circle cx="7" cy="-3" r="6" fill="#ced4da"/>`},
+  {x:90,y:150,svg:`<g fill="#ffe066" opacity=".9"><circle r="5"/><circle cx="12" cy="-8" r="4"/><circle cx="-10" cy="10" r="4"/><circle cx="14" cy="10" r="3"/><circle cx="-14" cy="-10" r="3"/></g>`},
+  {x:250,y:140,svg:`<path d="M-16 6 Q0 -20 16 6" stroke="#868e96" stroke-width="5" fill="none"/><path d="M0 -4 l0 -20" stroke="#8a5a2b" stroke-width="4"/><g fill="#e9ecef"><circle cx="-10" cy="4" r="6"/><circle cx="0" cy="0" r="7"/><circle cx="10" cy="4" r="6"/></g>`}];
+function scenePlushBelly(p){const c=skinOf(p),dk=shade(c);return `<rect width="400" height="300" fill="${c}"/><ellipse cx="200" cy="150" rx="150" ry="120" fill="#fff6ea"/><path d="M100 150 L140 124 L180 150 L220 124 L260 150 L300 124" stroke="${dk}" stroke-width="5" fill="none"/><ellipse cx="200" cy="140" rx="80" ry="24" fill="#3a2a2a" opacity=".22"/>`}
+const SEW_DOTS=[[100,150],[140,124],[180,150],[220,124],[260,150],[300,124]];
+function scenePlushFace(p){const c=skinOf(p),dk=shade(c);return `<rect width="400" height="300" fill="${c}"/><circle cx="130" cy="130" r="30" fill="#1f1f2a"/><circle cx="120" cy="120" r="8" fill="#fff"/><circle cx="270" cy="130" r="30" fill="${dk}" opacity=".5"/><path d="M270 130 q20 30 10 60" stroke="#222" stroke-width="3" fill="none"/><ellipse cx="200" cy="210" rx="40" ry="26" fill="#fff6ea"/><ellipse cx="200" cy="200" rx="14" ry="9" fill="#3a2a2a"/>`}
+const EYE_DOTS=[[270,76],[324,130],[270,184],[216,130]];
+function scenePills(){return `<rect width="400" height="300" fill="#f8f0ff"/><rect y="200" width="400" height="100" fill="#d0bfff"/><rect x="70" y="190" width="260" height="70" rx="14" fill="#fff" stroke="#9775fa" stroke-width="4"/>${[120,200,280].map((x,i)=>`<rect x="${x-34}" y="200" width="68" height="50" rx="10" fill="#f3f0ff" stroke="#b197fc" stroke-width="3"/><text x="${x}" y="276" font-size="15" text-anchor="middle" font-family="Fredoka" font-weight="600" fill="#5f3dc4">${['manhã','tarde','noite'][i]}</text>`).join('')}<circle cx="60" cy="40" r="22" fill="#ffd43b"/><path d="M350 30 a20 20 0 1 0 14 34 a16 16 0 1 1 -14 -34Z" fill="#748ffc"/>`}
+const PILL=c=>`<g><rect x="-18" y="-9" width="36" height="18" rx="9" fill="#fff" stroke="#adb5bd" stroke-width="2"/><path d="M0 -9 h9 a9 9 0 0 1 0 18 H0Z" fill="${c}"/></g>`;
+function sceneKitchen(){return `<rect width="400" height="300" fill="#fff9db"/><rect y="180" width="400" height="120" fill="#ffd8a8"/><ellipse cx="160" cy="190" rx="80" ry="22" fill="#fff"/><ellipse cx="160" cy="186" rx="50" ry="12" fill="#8ce99a"/><circle cx="140" cy="182" r="8" fill="#ff8787"/><circle cx="170" cy="184" r="7" fill="#ffd43b"/><rect x="310" y="170" width="64" height="90" rx="8" fill="#868e96"/><rect x="304" y="160" width="76" height="16" rx="6" fill="#495057"/><text x="342" y="226" font-size="30" text-anchor="middle">🗑️</text>`}
+const SALT=`<g><path d="M-14 -20 h28 l4 44 h-36Z" fill="#fff" stroke="#adb5bd" stroke-width="2"/><path d="M-14 -20 a14 10 0 0 1 28 0" fill="#adb5bd"/><text y="12" font-size="14" text-anchor="middle" font-family="Fredoka" font-weight="700" fill="#495057">SAL</text></g>`;
+
+/* ---- objetos ---- */
+const O={
+  cotonete:`<g><rect x="-3" y="2" width="6" height="70" rx="3" fill="#fff" stroke="#ccc"/><ellipse rx="8" ry="12" fill="#fff" stroke="#ddd"/></g>`,
+  gaze:`<g><rect x="-22" y="-22" width="44" height="44" rx="6" fill="#fff" stroke="#ced4da" stroke-width="2"/><path d="M-22 -8 h44 M-22 8 h44 M-8 -22 v44 M8 -22 v44" stroke="#e9ecef" stroke-width="2"/></g>`,
+  esponja:`<g><rect x="-30" y="-20" width="60" height="40" rx="12" fill="#ffe066" stroke="#f59f00" stroke-width="2"/>${[[-14,-6],[4,4],[16,-8],[-6,10]].map(([a,b])=>`<circle cx="${a}" cy="${b}" r="3" fill="#f59f00"/>`).join('')}</g>`,
+  escova:`<g><rect x="-6" y="10" width="12" height="80" rx="6" fill="#4dabf7"/><rect x="-16" y="-14" width="32" height="26" rx="5" fill="#fff" stroke="#adb5bd"/>${[-10,-4,2,8].map(x=>`<rect x="${x}" y="-12" width="4" height="22" fill="#e7f5ff"/>`).join('')}</g>`,
+  pente:`<g><rect x="-40" y="-10" width="80" height="16" rx="6" fill="#f783ac"/>${Array.from({length:12},(_,i)=>`<rect x="${-38+i*6.6}" y="4" width="3.5" height="20" rx="1.5" fill="#f783ac"/>`).join('')}</g>`,
+  rolo:c=>`<g><circle r="22" fill="${c}" stroke="#ced4da" stroke-width="2"/><circle r="8" fill="#ced4da"/></g>`,
+  algodao:`<g fill="#fff" stroke="#e9ecef"><circle r="14"/><circle cx="12" cy="-6" r="10"/><circle cx="-12" cy="-4" r="10"/></g>`,
+  compressa:`<g><rect x="-50" y="-22" width="100" height="44" rx="12" fill="#74c0fc" stroke="#339af0" stroke-width="3"/><path d="M-40 -8 h80 M-40 8 h80" stroke="#a5d8ff" stroke-width="4"/></g>`,
+  tipoia:`<g><path d="M-60 -40 L60 -40 L0 50Z" fill="#4c6ef5" stroke="#364fc7" stroke-width="3" stroke-linejoin="round"/></g>`,
+  muletas:`<g>${[-26,26].map(x=>`<rect x="${x-4}" y="-80" width="8" height="160" rx="4" fill="#adb5bd"/><rect x="${x-18}" y="-86" width="36" height="10" rx="5" fill="#495057"/><rect x="${x-12}" y="-14" width="24" height="8" rx="4" fill="#495057"/>`).join('')}</g>`,
+  bolsa:`<g><rect x="-10" y="-46" width="20" height="16" rx="4" fill="#868e96"/><path d="M-40 -32 h80 c10 30 10 60 0 80 h-80 c-10 -20 -10 -50 0 -80Z" fill="#ff6b6b" stroke="#e03131" stroke-width="3"/><path d="M-20 0 q20 -14 40 0" stroke="#ffc9c9" stroke-width="4" fill="none"/></g>`,
+  botao:`<g><circle r="26" fill="#1f1f2a"/><circle cx="-8" cy="-8" r="6" fill="#fff" opacity=".8"/></g>`,
+  espinho:`<g><path d="M-6 10 L0 -26 L6 10Z" fill="#6b4a1f"/></g>`,
+  carrapato:`<g><ellipse rx="16" ry="12" fill="#5a3a1a"/><path d="M-16 -4 l-10 -8 M-16 4 l-10 8 M16 -4 l10 -8 M16 4 l10 8 M-8 -11 l-4 -10 M8 -11 l4 -10" stroke="#3a2410" stroke-width="3"/></g>`,
+  pulga:`<g><ellipse rx="9" ry="6" fill="#3a2410"/><path d="M-6 4 l-6 8 M6 4 l6 8 M0 5 l0 9" stroke="#3a2410" stroke-width="2"/></g>`,
+  piolho:`<g><ellipse rx="8" ry="5" fill="#6c757d"/><path d="M-5 3 l-5 6 M5 3 l5 6 M0 4 l0 7" stroke="#495057" stroke-width="2"/></g>`,
+  lendea:`<g><ellipse rx="4" ry="3" fill="#f8f9fa" stroke="#adb5bd"/></g>`,
+  sujeira:r=>`<g><ellipse rx="${r}" ry="${r*.75}" fill="#7a5230" opacity=".85"/><circle cx="${r*.6}" cy="${-r*.5}" r="${r*.35}" fill="#7a5230" opacity=".85"/></g>`,
+  cera:r=>`<g><circle r="${r}" fill="#c99a2e"/><circle cx="${r*.5}" cy="${r*.4}" r="${r*.55}" fill="#c99a2e"/></g>`,
+  carie:`<g><circle r="9" fill="#6b4a1f"/></g>`,
+  germe:`<g><circle r="14" fill="#69db7c" opacity=".85"/>${[0,60,120,180,240,300].map(a=>`<line x1="0" y1="0" x2="${18*Math.cos(a*Math.PI/180)}" y2="${18*Math.sin(a*Math.PI/180)}" stroke="#40c057" stroke-width="3"/>`).join('')}<circle cx="-4" cy="-3" r="2.5" fill="#222"/><circle cx="4" cy="-3" r="2.5" fill="#222"/></g>`,
+  crack:`<g><circle r="16" fill="#fff" stroke="#adb5bd" stroke-width="2" stroke-dasharray="4 3"/><text y="6" font-size="16" text-anchor="middle">👆</text></g>`,
+  crackDone:`<g><path d="M-14 -10 l8 8 l-6 4 l10 10 M2 -14 l4 10 l8 2" stroke="#868e96" stroke-width="3" fill="none"/></g>`,
+  unhaGrande:`<g><path d="M-6 0 L0 30 L6 0Z" fill="#f1f3f5" stroke="#adb5bd" stroke-width="2"/><path d="M-10 12 h20" stroke="#ff6b6b" stroke-width="2" stroke-dasharray="3 3"/></g>`,
+  unhaCurta:`<g><path d="M-6 0 L0 12 L6 0Z" fill="#f1f3f5" stroke="#adb5bd" stroke-width="2"/></g>`,
+  ponto:`<g><circle r="9" fill="#fff" stroke="#5f3dc4" stroke-width="3"/></g>`,
+  pontoFeito:`<g><circle r="6" fill="#5f3dc4"/></g>`,
+  faixa:(c,rot)=>`<g transform="rotate(${rot})"><rect x="-14" y="-46" width="28" height="92" rx="6" fill="${c}" stroke="rgba(0,0,0,.12)" stroke-width="2"/></g>`,
+  faixaGuia:rot=>`<g transform="rotate(${rot})"><rect x="-14" y="-46" width="28" height="92" rx="6" fill="none" stroke="#5f3dc4" stroke-width="2" stroke-dasharray="6 5" opacity=".6"/></g>`,
+  check:`<g><circle r="12" fill="none" stroke="#5f3dc4" stroke-width="3" stroke-dasharray="5 4"/></g>`,
+  checkOk:`<g><circle r="8" fill="#ffb3c1"/></g>`
+};
+
+/* ---- definicao dos passos ---- */
+function STEP(id,p){
+  const sp=spOf(p),pes=sp==='pessoa',c=skinOf(p);
+  const wrapStripes=(col,horiz)=>{const it=[];if(horiz){for(let i=0;i<8;i++){const x=95+i*28;it.push({x,y:150,r:26,svg:O.faixa(col,12),guide:O.faixaGuia(12)})}}else{for(let i=0;i<7;i++){const y=60+i*28;it.push({x:200,y,r:26,svg:O.faixa(col,78),guide:O.faixaGuia(78)})}}return it};
+  const face=sceneFace(p),A=anchors(p);
+  switch(id){
+  case 'compressa':return {title:'Compressa geladinha',say:'Arraste a compressa geladinha até a testa.',eng:'drag',bg:face.svg,objs:[{svg:O.compressa,x:80,y:260,hit:50,zone:{x:face.map(A.forehead)[0],y:face.map(A.forehead)[1],r:55}}],done:'Que alívio! Fresquinho.'};
+  case 'xarope':return {title:'Xarope',say:'Segure o botão para pôr o xarope e solte quando chegar na linha!',eng:'hold',bg:BG+`<ellipse cx="200" cy="170" rx="110" ry="58" fill="#e9ecef" stroke="#adb5bd" stroke-width="4"/><rect x="300" y="160" width="100" height="22" rx="10" fill="#ced4da"/>`,band:[.62,.9],rate:.38,label:'SEGURAR',
+    vis:(v,h)=>`<ellipse cx="200" cy="${170}" rx="${100*v}" ry="${50*v}" fill="#e03131" opacity=".85"/><ellipse cx="200" cy="170" rx="${100*.76}" ry="${50*.76}" fill="none" stroke="#22314a" stroke-width="3" stroke-dasharray="8 6"/><g transform="translate(110 60) rotate(${h?40:15})"><rect x="-22" y="-40" width="44" height="70" rx="8" fill="#ff8787"/><rect x="-10" y="-56" width="20" height="18" fill="#495057"/></g>${h?'<path d="M140 70 Q170 110 190 150" stroke="#e03131" stroke-width="6" fill="none"/>':''}`,done:'Xarope na medida certinha!'};
+  case 'chamel':case 'cha':return {title:id==='cha'?'Chazinho':'Chá com mel',say:'Segure para encher a xícara e solte na linha!',eng:'hold',bg:BG+`<path d="M130 120 h140 v90 a40 40 0 0 1 -40 40 h-60 a40 40 0 0 1 -40 -40Z" fill="#fff" stroke="#adb5bd" stroke-width="4"/><path d="M270 140 a24 24 0 0 1 0 50" stroke="#adb5bd" stroke-width="8" fill="none"/>`,band:[.6,.88],rate:.36,label:'SEGURAR',
+    vis:(v,h)=>`<clipPath id="cupc"><path d="M134 124 h132 v86 a36 36 0 0 1 -36 36 h-60 a36 36 0 0 1 -36 -36Z"/></clipPath><rect clip-path="url(#cupc)" x="130" y="${250-126*v}" width="140" height="130" fill="${id==='cha'?'#8ce99a':'#ffc078'}"/><path d="M134 ${250-126*.75} h132" stroke="#22314a" stroke-width="3" stroke-dasharray="8 6"/><g transform="translate(110 50) rotate(${h?30:0})"><path d="M-30 -20 h50 l10 40 h-70Z" fill="#748ffc"/><path d="M20 -8 l30 -10" stroke="#748ffc" stroke-width="8"/></g>${h?'<path d="M160 40 Q180 80 196 130" stroke="#ffc078" stroke-width="6" fill="none"/>':''}`,done:'Que cheirinho bom!'};
+  case 'limparOuvido':return {title:'Limpar o ouvido',say:'Esfregue o cotonete na cera até o ouvido ficar limpinho!',eng:'rub',bg:sceneEar(p),tool:O.cotonete,mode:'remove',items:[[160,190,16],[190,206,12],[238,130,15],[222,116,10],[210,196,11],[250,170,10]].map(([x,y,r])=>({x,y,r:r+8,svg:O.cera(r)})),done:'Ouvido limpinho! Agora escuta tudo.'};
+  case 'gotasOuvido':return {title:'Gotinhas no ouvido',say:'Aperte PINGAR quando o vidrinho estiver em cima do ouvido!',eng:'drop',bg:sceneEar(p),target:{x:200,y:150,r:36},hits:3,done:'Pronto! As gotinhas vão tirar a dor.'};
+  case 'colirio':return {title:'Colírio',say:'Aperte PINGAR quando o vidrinho estiver em cima do olho!',eng:'drop',bg:sceneEye(p),target:{x:200,y:150,r:40},hits:3,extra:`<g id="cisco"><path d="M242 108 l9 -5 l3 8 l-8 6Z" fill="#5a4630"/></g>`,onHit:n=>{if(n>=2){const c=$('#cisco');if(c)c.remove()}},done:'O cisco saiu! Olho limpinho.'};
+  case 'gessoBraco':return {title:'Gesso no braço',say:'Passe o dedo pelas faixas, uma por uma, para enrolar o gesso!',eng:'rub',bg:sceneArm(p),tool:O.rolo('#fff'),mode:'reveal',ordered:true,items:wrapStripes('#f8f9fa',true),done:'Gesso prontinho!'};
+  case 'gessoPerna':return {title:'Gesso na perna',say:'Passe o dedo pelas faixas, de cima para baixo!',eng:'rub',bg:sceneLeg(p),tool:O.rolo('#fff'),mode:'reveal',ordered:true,items:wrapStripes('#f8f9fa',false),done:'Gesso prontinho!'};
+  case 'tala':return {title:'Tala na patinha',say:'Passe o dedo pelas faixas para enfaixar a patinha!',eng:'rub',bg:sceneArm(p),tool:O.rolo('#74c0fc'),mode:'reveal',ordered:true,items:wrapStripes('#74c0fc',true),done:'Patinha enfaixada!'};
+  case 'enfaixarAsa':return {title:'Enfaixar a asinha',say:'Passe o dedo pelas faixas para enfaixar a asinha!',eng:'rub',bg:sceneArm(p),tool:O.rolo('#ffa8a8'),mode:'reveal',ordered:true,items:wrapStripes('#ffa8a8',true).slice(0,7),done:'Asinha protegida!'};
+  case 'tipoia':return {title:'Tipoia',say:'Arraste a tipoia para segurar o braço.',eng:'drag',bg:sceneArm(p)+`<g opacity=".95">${wrapStripes('#f8f9fa',true).map(i=>`<g transform="translate(${i.x} ${i.y})">${i.svg}</g>`).join('')}</g>`,objs:[{svg:O.tipoia,x:70,y:60,hit:60,zone:{x:210,y:170,r:70}}],done:'Braço bem seguro!'};
+  case 'muletas':return {title:'Muletas',say:'Arraste as muletas para perto da perna.',eng:'drag',bg:sceneLeg(p)+`<g>${wrapStripes('#f8f9fa',false).map(i=>`<g transform="translate(${i.x} ${i.y})">${i.svg}</g>`).join('')}</g>`,objs:[{svg:O.muletas,x:70,y:170,hit:70,zone:{x:320,y:160,r:70}}],done:'Agora dá para andar!'};
+  case 'limparCorte':return {title:'Limpar o machucado',say:'Esfregue a gaze para tirar a sujeirinha do machucado!',eng:'rub',bg:(pes?sceneLeg(p):sceneArm(p))+`<path d="M${pes?175:170} ${pes?150:150} l${pes?50:60} 6" stroke="#d6336c" stroke-width="6" stroke-linecap="round"/>`,tool:O.gaze,mode:'remove',items:(pes?[[170,136],[230,170],[196,176],[214,128]]:[[160,136],[236,170],[196,170],[214,126]]).map(([x,y])=>({x,y,r:20,svg:O.sujeira(9)})),done:'Machucado limpinho!'};
+  case 'curativo':{const isLeg=pes&&p.f&&p.f.lupa&&p.f.lupa.w==='knee',isFoot=p.f&&p.f.lupa&&p.f.lupa.t==='espinho';
+    const bg=isFoot?sceneFoot(p):(isLeg?sceneLeg(p):sceneArm(p))+`<path d="M${isLeg?175:170} 150 l${isLeg?50:60} 6" stroke="#d6336c" stroke-width="6" stroke-linecap="round"/>`;
+    return {title:'Curativo',say:'Arraste o curativo para cima do machucado.',eng:'drag',bg,objs:[{svg:nest(CURS.bege.svg,110,44),x:80,y:260,hit:50,zone:{x:200,y:isFoot?160:153,r:50}}],done:'Curativo colocado!'}}
+  case 'tirarEspinho':return {title:'Tirar o espinho',say:'Puxe o espinho com a pinça e jogue na bandejinha!',eng:'drag',bg:sceneFoot(p)+`<rect x="290" y="230" width="100" height="56" rx="10" fill="#dee2e6" stroke="#adb5bd" stroke-width="3"/>`,objs:[{svg:O.espinho,x:200,y:160,hit:40,zone:{x:340,y:255,r:50},pinca:true}],done:'Espinho fora! Ufa!'};
+  case 'tirarCarrapato':return {title:'Tirar o carrapato',say:'Puxe o carrapato com a pinça e jogue no potinho!',eng:'drag',bg:sceneFur(p)+`<rect x="290" y="230" width="100" height="56" rx="10" fill="#dee2e6" stroke="#adb5bd" stroke-width="3"/>`,objs:[{svg:O.carrapato,x:170,y:130,hit:40,zone:{x:340,y:255,r:50},pinca:true}],done:'Carrapato tirado!'};
+  case 'endoscopio':return {title:'Câmera mágica',say:'Leve a câmera pelo caminho, bolinha por bolinha, até achar o botão!',eng:'rub',bg:sceneBelly(p),tool:`<g><circle r="12" fill="#4a5568"/><circle r="5" fill="#ffd43b"/></g>`,mode:'reveal',ordered:true,items:BELLY_PATH.map(([x,y],i)=>i===BELLY_PATH.length-1?{x,y,r:22,svg:`<g><circle r="13" fill="#fff" stroke="#ffd43b" stroke-width="3"/><circle cx="-4" cy="-4" r="2.5" fill="#333"/><circle cx="4" cy="-4" r="2.5" fill="#333"/><circle cx="-4" cy="4" r="2.5" fill="#333"/><circle cx="4" cy="4" r="2.5" fill="#333"/></g>`,guide:`<g><circle r="13" fill="#fff" stroke="#ffd43b" stroke-width="3" opacity=".6"/></g>`}:{x,y,r:20,svg:O.checkOk,guide:O.check}),done:'Peguei o botão! Saiu!'};
+  case 'bolsaMorna':{const b=face.map(A.belly);return {title:'Bolsa morninha',say:'Arraste a bolsa de água morna até a barriga.',eng:'drag',bg:face.svg,objs:[{svg:O.bolsa,x:70,y:230,hit:50,zone:{x:b[0],y:b[1],r:60}}],done:'Quentinho... a barriga já está melhor!'}}
+  case 'escovar':return {title:'Escovar os dentes',say:'Escove os dentes até as manchinhas sumirem!',eng:'rub',bg:sceneMouth(p),tool:O.escova,mode:'remove',fx:'bubbles',items:[[96,66],[166,62],[232,64],[306,68],[140,232],[214,236],[270,232]].map(([x,y])=>({x,y,r:22,svg:O.carie})),done:'Dentes brilhando!'};
+  case 'tirarAlergenos':return {title:'Tirar o que dá alergia',say:'Toque nas coisas que dão alergia para tirar da sala!',eng:'tap',bg:sceneRoom(),items:ALERGENOS.map(a=>({...a,r:28})),done:'Sala limpinha, sem alergia!'};
+  case 'caixaRemedio':return {title:'Caixinha de remédio',say:'Arraste um comprimido para cada horário!',eng:'drag',bg:scenePills(),objs:[['#4c6ef5',140],['#4c6ef5',200],['#4c6ef5',260]].map(([col,x],i)=>({svg:PILL(col),x,y:90,hit:30,zone:{x:[120,200,280][i],y:225,r:36},anyZone:true})),done:'Remédio organizado!'};
+  case 'tirarSal':return {title:'Menos sal',say:'Arraste o saleiro para o lixo!',eng:'drag',bg:sceneKitchen(),objs:[{svg:SALT,x:240,y:150,hit:40,zone:{x:342,y:200,r:50}}],done:'Comida saudável!'};
+  case 'catarPulgas':return {title:'Pegar as pulgas',say:'Toque nas pulgas para pegar todas!',eng:'tap',bg:sceneFur(p),moving:true,items:Array.from({length:7},()=>({x:rnd(60,340),y:rnd(50,250),r:22,svg:O.pulga})),done:'Peguei todas as pulgas!'};
+  case 'catarPiolho':return {title:'Pegar os piolhos',say:'Toque nos piolhos para pegar todos!',eng:'tap',bg:sceneHair(p),moving:true,items:Array.from({length:6},()=>({x:rnd(60,340),y:rnd(50,250),r:22,svg:O.piolho})),done:'Sem piolhos!'};
+  case 'pentear':return {title:'Pentear',say:'Passe o pente para tirar os ovinhos!',eng:'rub',bg:sceneHair(p),tool:O.pente,mode:'remove',items:[[90,80],[180,120],[280,90],[130,200],[250,210],[330,170]].map(([x,y])=>({x,y,r:22,svg:O.lendea})),done:'Cabelo limpinho!'};
+  case 'banho':return {title:'Banho',say:'Esfregue a esponja até tirar toda a sujeira!',eng:'rub',bg:p.kind==='pelucia'?`<rect width="400" height="300" fill="${c}"/><ellipse cx="200" cy="150" rx="150" ry="120" fill="#fff6ea"/>`:sceneFur(p),tool:O.esponja,mode:'remove',fx:'bubbles',items:[[90,90,16],[200,70,12],[310,100,15],[130,200,14],[260,210,16],[200,150,12]].map(([x,y,r])=>({x,y,r:r+12,svg:O.sujeira(r)})),done:'Cheirosinh'+(p.sex==='f'?'a':'o')+'!'};
+  case 'secar':return {title:'Secar',say:'Segure o botão do secador até secar!',eng:'hold',bg:face.svg,band:null,rate:.4,label:'SECAR',
+    vis:(v,h)=>`${Array.from({length:8},(_,i)=>`<circle cx="${110+i*24}" cy="${80+(i%3)*30}" r="5" fill="#74c0fc" opacity="${1-v}"/>`).join('')}<g transform="translate(340 220) rotate(-30)"><rect x="-50" y="-20" width="80" height="40" rx="18" fill="#f783ac"/><rect x="-10" y="16" width="18" height="50" rx="8" fill="#e64980"/></g>${h?'<path d="M280 190 q-30 -10 -60 -30 M286 206 q-40 -4 -80 -14 M290 222 q-40 6 -80 4" stroke="#adb5bd" stroke-width="3" fill="none" stroke-dasharray="8 6"/>':''}`,done:'Sequinh'+(p.sex==='f'?'a':'o')+' e fofinh'+(p.sex==='f'?'a':'o')+'!'};
+  case 'cortarUnha':return {title:'Cortar as unhas',say:'Toque na linha vermelha de cada unha para cortar!',eng:'tap',bg:sceneFoot(p),items:[[110,74],[170,44],[230,44],[290,74]].map(([x,y])=>({x,y,r:30,svg:`<g transform="rotate(180)">${O.unhaGrande}</g>`,after:`<g transform="rotate(180)">${O.unhaCurta}</g>`})),done:'Unhas cortadinhas!'};
+  case 'encher':return {title:'Colocar algodão',say:'Arraste as bolinhas de algodão para dentro do buraco!',eng:'drag',bg:scenePlushBelly(p),objs:[[60,60],[340,60],[60,250]].map(([x,y])=>({svg:O.algodao,x,y,hit:30,zone:{x:200,y:140,r:70},stack:true})),done:'Fofinh'+(p.sex==='f'?'a':'o')+' de novo!'};
+  case 'costurar':return {title:'Costurar',say:'Toque nos pontinhos, um de cada vez, para costurar!',eng:'tap',bg:scenePlushBelly(p),ordered:true,line:'#5f3dc4',items:SEW_DOTS.map(([x,y])=>({x,y,r:24,svg:O.ponto,after:O.pontoFeito})),done:'Costura perfeita!'};
+  case 'botaoOlho':return {title:'Colocar o olho',say:'Arraste o botão para o lugar do olhinho!',eng:'drag',bg:scenePlushFace(p),objs:[{svg:O.botao,x:300,y:250,hit:36,zone:{x:270,y:130,r:40}}],done:'Olhinho no lugar!'};
+  case 'costurarOlho':return {title:'Costurar o olho',say:'Toque nos pontinhos em volta do olho!',eng:'tap',bg:scenePlushFace(p)+`<g transform="translate(270 130)">${O.botao}</g>`,ordered:true,line:'#5f3dc4',items:EYE_DOTS.map(([x,y])=>({x,y,r:22,svg:O.ponto,after:O.pontoFeito})),done:'Agora não cai mais!'};
+  case 'alcool':return {title:'Limpar com algodão',say:'Esfregue o algodão para limpar antes da vacina!',eng:'rub',bg:sceneArm(p),tool:O.algodao,mode:'remove',items:[[170,140],[220,160],[196,130]].map(([x,y])=>({x,y,r:26,svg:O.germe})),done:'Limpinho para a vacina!'};
+  case 'injecao':return {title:'Vacina',say:'Segure o botão para dar a vacina, bem devagarinho!',eng:'hold',bg:sceneArm(p)+`<circle cx="200" cy="150" r="20" fill="none" stroke="#ff6b6b" stroke-width="3" stroke-dasharray="5 4"/>`,band:null,rate:.42,label:'SEGURAR',
+    vis:(v,h)=>`<g transform="translate(200 150) rotate(-40)"><path d="M0 0 V-34" stroke="#778" stroke-width="3"/><rect x="-14" y="-140" width="28" height="104" rx="6" fill="#fff" stroke="#99a" stroke-width="3"/><rect x="-10" y="${-136+96*v}" width="20" height="${96*(1-v)}" fill="#4dabf7"/><g transform="translate(0 ${96*v})"><rect x="-4" y="-200" width="8" height="64" fill="#778"/><rect x="-18" y="-206" width="36" height="10" rx="4" fill="#778"/></g></g>`,done:'Pronto! Nem doeu!'};
+  case 'curativoVacina':return {title:'Curativo da vacina',say:'Arraste o curativo para onde tomou a vacina.',eng:'drag',bg:sceneArm(p)+'<circle cx="200" cy="150" r="4" fill="#ff6b6b"/>',objs:[{svg:nest(CURS.azul.svg,90,36),x:80,y:260,hit:50,zone:{x:200,y:150,r:45}}],done:'Vacina tomada com coragem!'};
+  case 'tirarGesso':case 'tirarTala':{const col=id==='tirarGesso'?'#f8f9fa':(sp==='galinha'?'#ffa8a8':'#74c0fc');const leg=pes&&S.rec&&S.rec.pending&&S.rec.pending.caseId==='perna';
+    const base=leg?sceneLeg(p):sceneArm(p);const st=wrapStripes(col,!leg);
+    return {title:id==='tirarGesso'?'Tirar o gesso':'Tirar a faixa',say:'Toque nos pontinhos para abrir e tirar!',eng:'tap',bg:base+`<g id="castg">${st.map(i=>`<g transform="translate(${i.x} ${i.y})">${i.svg}</g>`).join('')}</g>`,items:(leg?[[200,80],[200,150],[200,220]]:[[120,150],[200,150],[280,150]]).map(([x,y])=>({x,y,r:26,svg:O.crack,after:O.crackDone})),onAll:()=>{const g=$('#castg');if(g)g.style.opacity=0},done:'Sarou! Osso forte de novo!'}}
+  case 'tirarCurativo':{const foot=S.rec&&S.rec.pending&&S.rec.pending.caseId==='espinho',leg=pes&&!foot;
+    return {title:'Tirar o curativo',say:'Puxe o curativo e jogue no lixo!',eng:'drag',bg:(foot?sceneFoot(p):leg?sceneLeg(p):sceneArm(p))+`<rect x="300" y="226" width="90" height="60" rx="10" fill="#868e96"/><text x="345" y="266" font-size="28" text-anchor="middle">🗑️</text>`,objs:[{svg:nest(CURS.bege.svg,110,44),x:200,y:foot?160:153,hit:50,zone:{x:345,y:250,r:50}}],done:'A pele sarou direitinho!'}}
+  case 'examinar':return {title:'Examinar',say:'Segure o botão para examinar se sarou!',eng:'hold',bg:sceneFace(p,false).svg,band:null,rate:.45,label:'EXAMINAR',
+    vis:(v,h)=>`<g transform="translate(${200+Math.sin(v*12)*30} ${170+Math.cos(v*9)*20})"><circle r="22" fill="#9aa5b8" stroke="#4a5568" stroke-width="5"/><circle r="12" fill="#dfe6f0"/></g>${v>.98?'<text x="200" y="60" font-size="40" text-anchor="middle">💖</text>':''}`,done:'Está tudo bem! Sarou!'};
+  }
+  return {title:'Cuidar',say:'Segure o botão para cuidar!',eng:'hold',bg:face.svg,band:null,rate:.5,label:'CUIDAR',vis:()=>'',done:'Muito bem!'};
+}
+
+/* ============ MOTOR DOS PUZZLES ============ */
+function startTreatment(){
+  S.t={steps:S.case.treat.slice(),i:0};go('trat');
+  $('#tTitle').textContent=(S.case.id==='retorno'?'Retorno: ':'Tratamento: ')+S.p.name;
+  runStep();
+}
+function renderProg(){const t=S.t;$('#tProg').innerHTML=t.steps.map((id,i)=>`<span class="tdot ${i<t.i?'ok':i===t.i?'now':''}">${i<t.i?'✓':i+1}. ${STEP(id,S.p).title}</span>`).join('')}
+function runStep(){
+  const t=S.t;cancelAnimationFrame(window._raf);clearInterval(window._hold);clearLater();
+  if(t.i>=t.steps.length){finishTreatment();return}
+  const st=STEP(t.steps[t.i],S.p);t.cur=st;renderProg();
+  $('#tInst').textContent=st.say;$('#tCtrl').innerHTML='';$('#tMsg').textContent='';
+  const sv=$('#tstage');const nsv=sv.cloneNode(false);sv.parentNode.replaceChild(nsv,sv);
+  nsv.innerHTML=`<g id="tbg">${st.bg}</g>${st.extra||''}<g id="titems"></g><g id="tfx"></g><g id="tdyn"></g><g id="ttool" transform="translate(-200 -200)">${st.tool||''}</g>`;
+  ({rub:engRub,tap:engTap,drag:engDrag,hold:engHold,drop:engDrop})[st.eng](nsv,st);
+  later(()=>say(st.say),300);
+}
+function stepDone(){
+  const st=S.t.cur;if(st.finished)return;st.finished=true;
+  tada();$('#tMsg').innerHTML=`<span class="ok">${st.done}</span>`;say(st.done);
+  S.t.i++;later(runStep,1900);
+}
+function bindPointer(sv,{down,move,up}){
+  let isDown=false;
+  sv.addEventListener('pointerdown',e=>{isDown=true;try{sv.setPointerCapture(e.pointerId)}catch(_){}e.preventDefault();ac();down&&down(svgPt(sv,e))});
+  sv.addEventListener('pointermove',e=>{if(isDown&&move)move(svgPt(sv,e))});
+  const u=e=>{if(!isDown)return;isDown=false;up&&up(svgPt(sv,e))};sv.addEventListener('pointerup',u);sv.addEventListener('pointercancel',u);
+}
+function engRub(sv,st){
+  const items=st.items.map((it,i)=>({...it,hp:1,on:false,i}));const g=sv.querySelector('#titems');
+  g.innerHTML=items.map(it=>st.mode==='reveal'?`<g data-i="${it.i}" transform="translate(${it.x} ${it.y})"><g class="gd ${it.i===0?'pulse':''}">${it.guide||O.check}</g><g class="ct" opacity="0">${it.svg}</g></g>`:`<g data-i="${it.i}" transform="translate(${it.x} ${it.y})">${it.svg}</g>`).join('');
+  let next=0,last=null;const tool=sv.querySelector('#ttool');
+  const touch=pt=>{
+    tool.setAttribute('transform',`translate(${pt.x} ${pt.y})`);
+    const mv=last?Math.hypot(pt.x-last.x,pt.y-last.y):0;last=pt;
+    if(st.fx==='bubbles'&&Math.random()<.35){const f=sv.querySelector('#tfx');f.insertAdjacentHTML('beforeend',`<circle cx="${pt.x+rnd(-20,20)}" cy="${pt.y+rnd(-20,20)}" r="${rnd(4,10)}" fill="#fff" stroke="#a5d8ff" opacity=".85"/>`);if(f.children.length>40)f.firstChild.remove()}
+    if(st.mode==='reveal'){
+      const it=items[next];if(!it)return;
+      if(Math.hypot(pt.x-it.x,pt.y-it.y)<it.r+6){const el=g.querySelector(`[data-i="${it.i}"]`);el.querySelector('.ct').setAttribute('opacity',1);el.querySelector('.gd').setAttribute('opacity',0);next++;tone(500+next*60,.08,'triangle',.18);
+        const nx=items[next];if(nx){g.querySelector(`[data-i="${nx.i}"] .gd`).classList.add('pulse')}else stepDone()}
+    }else{
+      let alive=0;items.forEach(it=>{if(it.hp<=0)return;if(Math.hypot(pt.x-it.x,pt.y-it.y)<it.r+10){it.hp-=.05+mv*.006;const el=g.querySelector(`[data-i="${it.i}"]`);if(it.hp<=0){el.remove();tone(900,.08,'sine',.15)}else el.setAttribute('opacity',Math.max(.15,it.hp))}if(it.hp>0)alive++});
+      if(mv>2&&Math.random()<.25)noise(.12,1800,1,.15,0,'highpass');
+      if(!alive)stepDone();
+    }
+  };
+  bindPointer(sv,{down:touch,move:touch,up:()=>{last=null}});
+}
+function engTap(sv,st){
+  const items=st.items.map((it,i)=>({...it,alive:true,i,vx:rnd(-60,60),vy:rnd(-60,60)}));const g=sv.querySelector('#titems');
+  g.innerHTML=items.map(it=>`<g data-i="${it.i}" transform="translate(${it.x} ${it.y})"><g class="in ${st.ordered&&it.i===0?'pulse':''}">${it.svg}</g>${st.ordered?`<text y="-16" font-size="14" text-anchor="middle" font-family="Fredoka" font-weight="700" fill="#5f3dc4">${it.i+1}</text>`:''}</g>`).join('');
+  let next=0;const pts=[];
+  if(st.moving){let t0=performance.now();const loop=now=>{const dt=Math.min(.05,(now-t0)/1000);t0=now;items.forEach(it=>{if(!it.alive)return;if(Math.random()<.02){it.vx=rnd(-90,90);it.vy=rnd(-90,90)}it.x+=it.vx*dt;it.y+=it.vy*dt;if(it.x<30||it.x>370)it.vx*=-1;if(it.y<30||it.y>270)it.vy*=-1;it.x=Math.max(30,Math.min(370,it.x));it.y=Math.max(30,Math.min(270,it.y));const el=g.querySelector(`[data-i="${it.i}"]`);if(el)el.setAttribute('transform',`translate(${it.x} ${it.y})`)});window._raf=requestAnimationFrame(loop)};window._raf=requestAnimationFrame(loop)}
+  bindPointer(sv,{down:pt=>{
+    let cand=items.filter(it=>it.alive&&Math.hypot(pt.x-it.x,pt.y-it.y)<it.r+14);
+    if(st.ordered)cand=cand.filter(it=>it.i===next);
+    if(!cand.length){if(st.ordered&&items[next]&&Math.hypot(pt.x-items[next].x,pt.y-items[next].y)>40){$('#tMsg').textContent='Toque no número '+(next+1)+'!'}return}
+    const it=cand[0];it.alive=false;const el=g.querySelector(`[data-i="${it.i}"]`);
+    if(it.after){el.querySelector('.in').innerHTML=it.after;el.querySelector('.in').classList.remove('pulse');const tx=el.querySelector('text');if(tx)tx.remove()}else{el.classList.add('popout');setTimeout(()=>el.remove(),300)}
+    tone(st.moving?1200:700,.08,'triangle',.2);
+    if(st.ordered){pts.push([it.x,it.y]);next++;const nx=items[next];if(nx)g.querySelector(`[data-i="${nx.i}"] .in`).classList.add('pulse');
+      if(st.line&&pts.length>1)sv.querySelector('#tfx').innerHTML=`<polyline points="${pts.map(p=>p.join(',')).join(' ')}" fill="none" stroke="${st.line}" stroke-width="4" stroke-dasharray="10 6"/>`}
+    if(items.every(i=>!i.alive)){if(st.onAll)st.onAll();stepDone()}
+  }});
+}
+function engDrag(sv,st){
+  const objs=st.objs.map((o,i)=>({...o,i,cx:o.x,cy:o.y,placed:false}));const g=sv.querySelector('#titems');
+  const zones=[];objs.forEach(o=>{if(!zones.some(z=>z.x===o.zone.x&&z.y===o.zone.y))zones.push(o.zone)});
+  sv.querySelector('#tfx').innerHTML=zones.map((z,j)=>`<circle data-z="${j}" cx="${z.x}" cy="${z.y}" r="${z.r*.8}" fill="rgba(124,92,255,.08)" stroke="#7c5cff" stroke-width="3" stroke-dasharray="8 6" class="pulse"/>`).join('');
+  g.innerHTML=objs.map(o=>`<g data-i="${o.i}" transform="translate(${o.cx} ${o.cy})">${o.svg}${o.pinca?'<g class="pinca" opacity="0"><path d="M-4 -28 L-14 -90 M4 -28 L14 -90" stroke="#868e96" stroke-width="6" stroke-linecap="round"/></g>':''}</g>`).join('');
+  let cur=null,off=[0,0];const used=new Set();
+  bindPointer(sv,{
+    down:pt=>{const c=objs.filter(o=>!o.placed&&Math.hypot(pt.x-o.cx,pt.y-o.cy)<o.hit+16);if(!c.length)return;cur=c[c.length-1];off=[pt.x-cur.cx,pt.y-cur.cy];const el=g.querySelector(`[data-i="${cur.i}"]`);g.appendChild(el);const pc=el.querySelector('.pinca');if(pc)pc.setAttribute('opacity',1);tone(600,.05,'sine',.12)},
+    move:pt=>{if(!cur)return;cur.cx=pt.x-off[0];cur.cy=pt.y-off[1];g.querySelector(`[data-i="${cur.i}"]`).setAttribute('transform',`translate(${cur.cx} ${cur.cy})`)},
+    up:()=>{if(!cur)return;const o=cur;cur=null;
+      let z=o.zone;if(o.anyZone){const free=objs.map(x=>x.zone).filter(zz=>!used.has(zz.x+','+zz.y));z=free.sort((a,b)=>Math.hypot(o.cx-a.x,o.cy-a.y)-Math.hypot(o.cx-b.x,o.cy-b.y))[0]||o.zone}
+      if(Math.hypot(o.cx-z.x,o.cy-z.y)<z.r+10){o.placed=true;used.add(z.x+','+z.y);const n=objs.filter(x=>x.placed&&x.zone===o.zone).length;
+        o.cx=z.x+(o.stack?rnd(-18,18):0);o.cy=z.y+(o.stack?rnd(-10,10):0);const el=g.querySelector(`[data-i="${o.i}"]`);el.setAttribute('transform',`translate(${o.cx} ${o.cy})`);
+        const pc=el.querySelector('.pinca');if(pc)pc.setAttribute('opacity',0);tone(880,.12,'triangle',.2);
+        if(!o.anyZone&&!o.stack){const zi=zones.indexOf(o.zone);const ze=sv.querySelector(`[data-z="${zi}"]`);if(ze)ze.remove()}
+        if(o.anyZone){const zi=zones.findIndex(zz=>zz.x===z.x&&zz.y===z.y);const ze=sv.querySelector(`[data-z="${zi}"]`);if(ze)ze.remove()}
+        if(objs.every(x=>x.placed)){sv.querySelector('#tfx').innerHTML='';stepDone()}}
+      else{const el=g.querySelector(`[data-i="${o.i}"]`);const pc=el.querySelector('.pinca');if(pc)pc.setAttribute('opacity',0)}}
+  });
+}
+function engHold(sv,st){
+  let v=0,h=false;const dyn=sv.querySelector('#tdyn');const draw=()=>{dyn.innerHTML=st.vis(Math.min(1,v),h)};draw();
+  $('#tCtrl').innerHTML=`<button class="redbtn" id="holdbtn" style="margin:0 auto;font-size:${st.label.length>7?17:22}px">${st.label}</button>`;
+  const b=$('#holdbtn');
+  const start=e=>{e.preventDefault();if(st.finished)return;h=true;ac();try{b.setPointerCapture(e.pointerId)}catch(_){}
+    clearInterval(window._hold);window._hold=setInterval(()=>{v+=st.rate*.03;if(Math.random()<.3)tone(st.band?300+v*500:200+v*300,.04,'sine',.06);
+      if(st.band&&v>=1){clearInterval(window._hold);h=false;v=0;draw();oops();$('#tMsg').textContent='Ops, passou da linha! Tenta de novo e solta na linha.';say('Ops! Passou da linha. Tenta de novo!');return}
+      if(!st.band&&v>=1){clearInterval(window._hold);h=false;v=1;draw();stepDone();return}draw()},30)};
+  const stop=()=>{if(!h)return;h=false;clearInterval(window._hold);draw();
+    if(st.band){if(v>=st.band[0]&&v<=st.band[1])stepDone();else if(v>0.03){$('#tMsg').textContent='Mais um pouquinho! Segure de novo.';say('Mais um pouquinho!')}}};
+  b.addEventListener('pointerdown',start);b.addEventListener('pointerup',stop);b.addEventListener('pointercancel',stop);b.addEventListener('pointerleave',stop);
+}
+function engDrop(sv,st){
+  let hits=0,busy=false,bx=200;const dyn=sv.querySelector('#tdyn');const T=st.target;
+  sv.querySelector('#tfx').innerHTML=`<circle cx="${T.x}" cy="${T.y}" r="${T.r}" fill="none" stroke="#4dabf7" stroke-width="3" stroke-dasharray="8 6" class="pulse"/>`;
+  const t0=performance.now();
+  const loop=now=>{bx=200+140*Math.sin((now-t0)/1000*1.5);const el=sv.querySelector('#bottle');if(el)el.setAttribute('transform',`translate(${bx} 34)`);window._raf=requestAnimationFrame(loop)};
+  dyn.insertAdjacentHTML('beforeend',`<g id="bottle" transform="translate(200 34)"><rect x="-16" y="-30" width="32" height="44" rx="8" fill="#e7f5ff" stroke="#4dabf7" stroke-width="3"/><path d="M-6 14 h12 l-6 12Z" fill="#4dabf7"/><rect x="-10" y="-40" width="20" height="12" rx="3" fill="#4dabf7"/></g><g id="drops"></g>`);
+  window._raf=requestAnimationFrame(loop);
+  $('#tCtrl').innerHTML=`<button class="redbtn" id="dropbtn" style="margin:0 auto;background:radial-gradient(circle at 35% 30%,#a5d8ff,#1c7ed6 60%,#1864ab);box-shadow:0 8px 0 #0b3d73,0 0 0 8px #d0ebff">PINGAR</button><div class="center" id="dropcount" style="font-size:22px;font-weight:600;margin-top:8px">💧 0 de ${st.hits}</div>`;
+  $('#dropbtn').addEventListener('pointerdown',e=>{e.preventDefault();if(busy||st.finished)return;busy=true;ac();const x0=bx;const ds=sv.querySelector('#drops');
+    const d=document.createElementNS('http://www.w3.org/2000/svg','circle');d.setAttribute('r',7);d.setAttribute('fill','#4dabf7');d.setAttribute('cx',x0);d.setAttribute('cy',64);ds.appendChild(d);tone(1400,.05,'sine',.12);
+    const s0=performance.now();const fall=now=>{const k=Math.min(1,(now-s0)/450);d.setAttribute('cy',64+(T.y-64)*k*k);if(k<1)requestAnimationFrame(fall);else land()};requestAnimationFrame(fall);
+    function land(){d.remove();const ok=Math.abs(x0-T.x)<T.r;ds.insertAdjacentHTML('beforeend',`<circle cx="${x0}" cy="${T.y}" r="10" fill="none" stroke="${ok?'#4dabf7':'#adb5bd'}" stroke-width="4" class="popout"/>`);
+      setTimeout(()=>{if(ds.firstChild)ds.firstChild.remove()},400);busy=false;
+      if(ok){hits++;tone(700,.1,'sine',.2,0,1100);$('#dropcount').textContent=`💧 ${hits} de ${st.hits}`;if(st.onHit)st.onHit(hits);if(hits>=st.hits)stepDone()}
+      else{noise(.15,800,1,.2,0,'bandpass');$('#tMsg').textContent='Quase! Espera o vidrinho ficar em cima e aperta.'}}
+  });
+}
+
+/* ============ FIM DO TRATAMENTO, ADESIVO E RECEITA ============ */
+function finishTreatment(){
+  renderProg();const p=S.p;const face=sceneFace({...p});
+  const sv=$('#tstage');sv.innerHTML=`<rect width="400" height="300" fill="#fff9db"/><g transform="translate(${(400-avVB(p)[0]*face.s)/2} ${(300-avVB(p)[1]*face.s)/2}) scale(${face.s})">${avInner(avatar(p,{}))}</g><text x="200" y="40" font-size="30" text-anchor="middle" font-family="Fredoka" font-weight="700" fill="#e64980">${S.case.id==='retorno'?'SAROU!':'Muito bem, doutora!'}</text>`;
+  $('#tInst').textContent='Escolha um adesivo de corajoso para '+p.name+'!';$('#tMsg').textContent='';
+  $('#tCtrl').innerHTML=`<div class="stickers">${Object.keys(STICKERS).map(k=>`<button data-k="${k}" onclick="pickSticker('${k}')">${STICKERS[k]}</button>`).join('')}</div><div class="actions"><button class="big" onclick="showReceita()">${S.case.id==='retorno'?'Dar alta':'Assinar a receita'}</button></div>`;
+  confetti();tada();say('Muito bem! Escolha um adesivo de corajoso para '+p.name+'!');
+}
+function pickSticker(k){S.visit.sticker=k;document.querySelectorAll('#tCtrl .stickers button').forEach(b=>b.classList.toggle('sel',b.dataset.k===k));tada();say('Adesivo de '+STKNAME[k]+'!')}
+function openDiag(){
+  click();const p=S.p,c=S.case;
+  let opts=casesFor(p).filter(x=>x.id!==c.id).sort(()=>Math.random()-.5).slice(0,5);opts.push(c);opts.sort(()=>Math.random()-.5);
+  $('#diagGrid').innerHTML=opts.map(d=>`<button class="opt" onclick="chooseDiag('${d.id}')"><span class="emo">${d.emo}</span>${d.name}</button>`).join('');
+  $('#diagMsg').classList.add('hidden');go('diag');
+  say('O que '+(p.sex==='f'?'a ':'o ')+p.name+' tem?');
+}
+function chooseDiag(id){
+  const c=S.case;
+  if(id!==c.id){S.wrong++;oops();const m=$('#diagMsg');m.classList.remove('hidden');const t=`Hmm, será que é isso mesmo, doutora? ${c.hint}`;m.textContent=t;say(t);return}
+  tada();S.diag=id;say('Isso mesmo! '+c.name+'! Agora vamos tratar.');setTimeout(startTreatment,900);
+}
+function showReceita(){
+  const p=S.p,d=S.doc,c=S.case,V=S.visit,ret=c.id==='retorno';
+  const logo=p.kind==='pessoa'?`<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="${d.color}"/><path d="M32 16 v32 M16 32 h32" stroke="#fff" stroke-width="10" stroke-linecap="round"/></svg>`:`<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="${d.color}"/><ellipse cx="32" cy="40" rx="11" ry="9" fill="#fff"/><circle cx="19" cy="27" r="5" fill="#fff"/><circle cx="27" cy="19" r="5" fill="#fff"/><circle cx="37" cy="19" r="5" fill="#fff"/><circle cx="45" cy="27" r="5" fill="#fff"/></svg>`;
+  const lugar=p.kind==='pessoa'?'Consultório':p.kind==='pelucia'?'Hospital de Pelúcias':'Clínica Veterinária';
+  let extra='';
+  if(V.temp)extra+=`<div class="rxline"><b>Temperatura:</b> ${fmt(V.temp)} °C</div>`;
+  if(V.h)extra+=`<div class="rxline"><b>Altura e peso:</b> ${V.h} cm, ${fmt(V.w)} kg</div>`;
+  if(V.sticker)extra+=`<div class="rxline"><b>Adesivo de corajoso:</b> ${STICKERS[V.sticker]}</div>`;
+  if(V.curPhoto)extra+=`<div class="rxline"><b>Curativo:</b><br><img src="${V.curPhoto}" alt="" style="width:240px;max-width:100%;border-radius:12px;margin-top:4px"></div>`;
+  const items=c.treat.map(id=>`<div class="rxitem"><span class="emo" style="font-size:34px">✅</span><div><b>${STEP(id,p).title}</b></div></div>`).join('');
+  const hoje=new Date().toLocaleDateString('pt-BR');
+  $('#receitaBox').innerHTML=`
+   <div class="rxhead">${logo}<div><h2>${lugar} da ${d.name}</h2><small>${ret?'Alta médica':'Receita'} • ${hoje}</small></div>${p.photo?`<img src="${p.photo}" alt="" style="width:86px;height:86px;border-radius:16px;object-fit:cover;margin-left:auto">`:''}</div>
+   <div class="rxline"><b>Paciente:</b> ${esc(p.name)} (${spLabel(p).toLowerCase()}, ${sexWord(p)}, ${p.age} ${p.age===1?'ano':'anos'})</div>
+   <div class="rxline"><b>${ret?'Resultado':'Diagnóstico'}:</b> ${c.name}</div>${extra}
+   <div class="rxline" style="margin-top:12px"><b>${ret?'Na consulta de retorno':'Tratamento feito'}:</b></div>${items}
+   <div class="rxline" style="margin-top:12px"><b>Cuidados em casa:</b> ${c.care}</div>
+   ${!ret&&c.ret?'<div class="rxline"><b>Retorno:</b> volte daqui a alguns dias para ver se sarou!</div>':''}
+   <div class="rxfoot"><div class="stamp">${ret?'SAROU!<br>★<br>'+d.name.toUpperCase():d.name.toUpperCase()+'<br>★ CRM ★<br>KIDS'}</div><div class="sign">${d.name}</div></div>`;
+  if(!S.visitSaved){V.diag=ret?'retorno':c.id;V.treat=c.treat;V.notes=S.notes.map(stripTags);S.rec.visits.push(V);
+    if(ret){delete S.rec.pending}else if(c.ret){S.rec.pending={caseId:c.id,ret:c.ret,date:Date.now()}}else delete S.rec.pending;
+    S.rec.last=Date.now();saveDB();S.visitSaved=true;bump(d.id)}
+  go('receita');tada();confetti();
+  setTimeout(()=>say(ret?`${p.name} sarou! Alta médica! Muito bem, ${d.name.replace('Dra.','doutora')}!`:`Receita pronta! ${c.ret?'Não esquece de voltar para o retorno!':''} Muito bem, ${d.name.replace('Dra.','doutora')}!`),300);
+}
+/* ============ RETORNO ============ */
+function startRetorno(){
+  const rec=S.rec,pd=rec.pending,c=CASE[pd.caseId]||CASES[0],p=S.p;
+  p.caseId='retorno';p.f={};p.temp=36.5;p.tempRef='';p.bp=[12,8];p.bpm=80;
+  const o=p.sex==='f'?'a':'o',sp=spOf(p);
+  p.complaint=p.kind==='pessoa'?'Voltei, doutora! Estou bem melhor!':p.kind==='pelucia'?`A dona conta: ${o.toUpperCase()} ${p.name} está novinh${o} em folha!`:`${SPECIES[sp].voice||''} O dono conta: ${o.toUpperCase()} ${p.name} está bem melhor!`;
+  const steps={gesso:['tirarGesso'],tala:['tirarTala'],curativo:['tirarCurativo'],check:['examinar']}[pd.ret]||['examinar'];
+  S.case={id:'retorno',name:'Sarou de '+c.name.toLowerCase()+'!',treat:steps,care:'Pode brincar à vontade!',ret:null};S.diag='retorno';
+  startTreatment();setTimeout(()=>say(p.complaint),200);
+}
+
+const EAR_SVG=`<defs><radialGradient id="earg" cx="50%" cy="50%" r="62%"><stop offset="0" stop-color="#3a1414"/><stop offset=".33" stop-color="#a24a4a"/><stop offset=".72" stop-color="#eda39b"/><stop offset="1" stop-color="#f7c6b8"/></radialGradient></defs><rect width="200" height="200" fill="url(#earg)"/><ellipse cx="100" cy="100" rx="34" ry="30" fill="#d9c8c0"/><path d="M100 100 l16 20 -22 4Z" fill="#fff" opacity=".75"/><ellipse cx="100" cy="100" rx="34" ry="30" fill="none" stroke="#a0524f" stroke-width="3"/>`;
+let camStream=null;
 async function camOn(sel){
   try{
     if(!camStream)camStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'},audio:false});
@@ -1013,27 +1638,6 @@ async function toggleCam(auto){
 function stopCam(){if(camStream){camStream.getTracks().forEach(t=>t.stop());camStream=null}
   document.querySelectorAll('video').forEach(v=>{v.classList.add('hidden');v.srcObject=null});
   const f=$('#tface');if(f)f.classList.remove('hidden');const b=$('#camb');if(b&&!b.disabled)b.textContent='📷 Usar a câmera do tablet'}
-function runThermo(){
-  const p=S.p,pet=p.kind==='pet',target=Math.round(p.temp*10)/10;
-  $('#tbtn').disabled=true;$('#laser').classList.add('on');$('#tres').textContent='';
-  const lcd=$('#lcd');lcd.className='lcd';
-  let v=pet?36.0:34.0;const steps=26,inc=(target-v)/steps;let i=0;
-  window._ti=setInterval(()=>{i++;v+=inc;lcd.textContent=fmt(i>=steps?target:v)+' °C';tone(1500+i*20,.03,'square',.04);
-    if(i>=steps){clearInterval(window._ti);finish()}},90);
-  function finish(){
-    $('#laser').classList.remove('on');$('#tbtn').disabled=false;
-    const fever=p.cond==='febre';
-    lcd.classList.add(fever?'hot':'okc');S.visit.temp=target;
-    tone(fever?880:2000,.5,'square',.08);if(fever)tone(880,.5,'square',.08,.6);
-    const ref=pet?` Para ${p.species==='cachorro'?'cachorro':'gato'}, até 39,2 °C é normal.`:' Para pessoas, até 37,5 °C é normal.';
-    if(fever){$('#tres').innerHTML=`<span class="bad">${fmt(target)} °C: está com febre!</span><div style="font-size:17px;font-weight:500;margin-top:4px">${ref}</div>`;
-      say(`${fmt(target)} graus. Está com febre!`);addNote('thermo',`Temperatura: <b class="bad">${fmt(target)} °C, febre</b>`)}
-    else{$('#tres').innerHTML=`<span class="ok">${fmt(target)} °C: temperatura normal!</span><div style="font-size:17px;font-weight:500;margin-top:4px">${ref}</div>`;
-      say(`${fmt(target)} graus. Temperatura normal!`);addNote('thermo',`Temperatura: <b class="ok">${fmt(target)} °C, normal</b>`)}
-  }
-}
-
-/* ---- PRESSAO ---- */
 function openBP(){
   const p=S.p;
   let ticks='';for(let i=0;i<=30;i++){const a=(-225+i*9)*Math.PI/180,r1=i%5?82:74;ticks+=`<line x1="${100+Math.cos(a)*r1}" y1="${100+Math.sin(a)*r1}" x2="${100+Math.cos(a)*90}" y2="${100+Math.sin(a)*90}" stroke="#334" stroke-width="${i%5?2:4}"/>`;
@@ -1075,92 +1679,28 @@ function runBP(){
   window._raf=requestAnimationFrame(step);
   function fin(){
     cuff.style.transform='';heart.setAttribute('fill','#ff4d6d');$('#bpbtn').disabled=false;
-    const high=p.cond==='pressao';$('#bplcd').textContent=`${sy} por ${di}`;$('#bplcd').classList.add(high?'hot':'okc');
+    const high=!!p.f.pressao;$('#bplcd').textContent=`${sy} por ${di}`;$('#bplcd').classList.add(high?'hot':'okc');
     tone(high?600:1800,.4,'square',.07);
     if(high){$('#bpres').innerHTML=`<span class="bad">${sy} por ${di}: a pressão está alta!</span>`;say(`${sy} por ${di}. A pressão está alta!`);addNote('bp',`Pressão: <b class="bad">${sy} por ${di}, alta</b>`)}
     else{$('#bpres').innerHTML=`<span class="ok">${sy} por ${di}: pressão normal!</span>`;say(`${sy} por ${di}. Pressão normal!`);addNote('bp',`Pressão: <b class="ok">${sy} por ${di}, normal</b>`)}
   }
 }
-
-/* ---- ESTETOSCOPIO ---- */
-function openStetho(){
-  const p=S.p;
-  openPanel('Estetoscópio',`<div class="stwrap" id="stw">${avatar(p,{spots:true,sad:p.cond!=='saudavel'})}</div>
-   <div class="result" id="stres">Toque no coração ou na barriga para escutar.</div>`);
-  say('Toque no coração ou na barriga para escutar!');
+function later(fn,ms){const t=setTimeout(fn,ms);(window._to=window._to||[]).push(t);return t}
+function clearLater(){(window._to||[]).forEach(clearTimeout);window._to=[]}
+function throatSVG(inf){return `<rect width="200" height="200" fill="${inf?'#c2253b':'#e98a8a'}"/><path d="M0 0 H200 V74 Q100 24 0 74Z" fill="${inf?'#e0485c':'#f4b0aa'}"/><ellipse cx="100" cy="118" rx="38" ry="44" fill="#3a0a12"/><path d="M88 52 Q100 58 112 52 Q110 92 100 96 Q90 92 88 52Z" fill="${inf?'#ff6b7f':'#f6a3a0'}"/><ellipse cx="54" cy="118" rx="17" ry="27" fill="${inf?'#ff3b4e':'#f08f8f'}"/><ellipse cx="146" cy="118" rx="17" ry="27" fill="${inf?'#ff3b4e':'#f08f8f'}"/>${inf?'<g fill="#fff8e1"><circle cx="50" cy="110" r="3"/><circle cx="58" cy="124" r="2.5"/><circle cx="150" cy="112" r="3"/><circle cx="142" cy="126" r="2.5"/></g>':''}<path d="M6 200 Q20 140 100 142 Q180 140 194 200Z" fill="#ff8fa3"/><path d="M100 150 V196" stroke="#e86b87" stroke-width="3"/>`}
+async function otoCam(auto){
+  if(camStream&&!auto){stopCam();S.torch=false;$('#otoview').classList.remove('cam');$('#torchb').classList.add('hidden');$('#otocamb').textContent='📷 Usar a câmera';return}
+  const ok=await camOn('#otovid');
+  if(!$('#otoview'))return;
+  if(ok){$('#otoview').classList.add('cam');$('#otocamb').classList.remove('hidden');$('#otocamb').textContent='🖼️ Usar o desenho';
+    try{const tr=camStream.getVideoTracks()[0];const caps=tr.getCapabilities?tr.getCapabilities():{};if(caps.torch)$('#torchb').classList.remove('hidden')}catch(e){}}
+  else if(!auto){$('#otocamb').textContent='A câmera não abriu aqui';$('#otocamb').disabled=true}
 }
-function listen(where){
-  stopAudio();const p=S.p;const a=ac();
-  if(where==='heart'){
-    const iv=60/p.bpm;
-    if(a){stethoNoise(6.5);const beat=()=>heartBeat();beat();window._hb=setInterval(beat,iv*1000);setTimeout(()=>clearInterval(window._hb),6500)}
-    const fast=p.cond==='febre';
-    $('#stres').innerHTML=`${p.bpm} batidas por minuto: `+(fast?`<span class="bad">o coração está acelerado!</span>`:`<span class="ok">o coração está batendo certinho!</span>`);
-    say(fast?'Tum tum tum! O coração está acelerado.':'Tum tum! O coração está batendo certinho.');
-    addNote('heart',`Coração: ${p.bpm} batidas por minuto, `+(fast?'<b class="bad">acelerado</b>':'<b class="ok">normal</b>'));
-  }else{
-    const sick=p.cond==='barriga';
-    document.querySelectorAll('#stw [data-spot="belly"]').forEach(g=>g.classList.toggle('wob',sick));
-    if(a){stethoNoise(sick?5:3);bellySound(sick)}
-    $('#stres').innerHTML=sick?`<span class="bad">Grrrrooonc! A barriga está fazendo muito barulho!</span>`:`<span class="ok">A barriga está calminha.</span>`;
-    say(sick?'Grrrrooonc! A barriga está fazendo muito barulho!':'A barriga está calminha.');
-    addNote('belly','Barriga: '+(sick?'<b class="bad">muito barulho, dolorida</b>':'<b class="ok">calminha</b>'));
-  }
-  if(S.done.heart&&S.done.belly)S.done.stetho=true;renderTools();
+function toggleTorch(force){
+  if(!camStream)return;S.torch=force===undefined?!S.torch:force;
+  try{camStream.getVideoTracks()[0].applyConstraints({advanced:[{torch:S.torch}]}).catch(()=>{})}catch(e){}
+  const b=$('#torchb');if(b)b.textContent=S.torch?'💡 Apagar lanterna':'💡 Lanterna';
 }
-
-/* ============ DIAGNOSTICO ============ */
-function openDiag(){
-  click();const p=S.p;
-  const list=DIAGS[p.kind].filter(d=>!d.min30||p.age>=30);
-  $('#diagGrid').innerHTML=list.map(d=>`<button class="opt" onclick="chooseDiag('${d.id}')">${d.ic}${d.name}</button>`).join('');
-  $('#diagMsg').classList.add('hidden');go('diag');
-  say('O que '+(p.sex==='f'?'a ':'o ')+p.name+' tem?');
-}
-function chooseDiag(id){
-  const p=S.p;
-  tada();S.diag=id;S.rxSel=new Set();
-  const d=DIAGS[p.kind].find(x=>x.id===id);
-  $('#rxTitle').textContent='Remédios para: '+d.name;
-  $('#rxGrid').innerHTML=MEDS[p.kind].map(m=>`<button class="opt" data-id="${m.id}" onclick="toggleMed('${m.id}')" style="position:relative">${CURE[p.kind][id].includes(m.id)?'<span class="sug">★ combina</span>':''}${m.ic}${m.name}</button>`).join('');
-  $('#rxMsg').classList.add('hidden');go('rx');
-  say('Agora escolha os remédios. Os que têm estrelinha combinam com esse diagnóstico.');
-}
-function toggleMed(id){click();if(S.rxSel.has(id))S.rxSel.delete(id);else S.rxSel.add(id);
-  document.querySelectorAll('#rxGrid .opt').forEach(b=>b.classList.toggle('sel',S.rxSel.has(b.dataset.id)))}
-function signRx(){
-  const p=S.p,ok=CURE[p.kind][S.diag],bonus=BONUS[p.kind],m=$('#rxMsg');
-  const sel=[...S.rxSel];
-  if(!sel.length){oops();m.classList.remove('hidden');m.textContent='Escolha pelo menos um remédio!';say(m.textContent);return}
-  showReceita(sel);
-}
-
-/* ============ RECEITA ============ */
-function showReceita(sel){
-  const p=S.p,d=S.doc,dg=DIAGS[p.kind].find(x=>x.id===S.diag);
-  const logo=p.kind==='pet'?`<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="${d.color}"/><ellipse cx="32" cy="40" rx="11" ry="9" fill="#fff"/><circle cx="19" cy="27" r="5" fill="#fff"/><circle cx="27" cy="19" r="5" fill="#fff"/><circle cx="37" cy="19" r="5" fill="#fff"/><circle cx="45" cy="27" r="5" fill="#fff"/></svg>`
-    :`<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="${d.color}"/><path d="M32 16 v32 M16 32 h32" stroke="#fff" stroke-width="10" stroke-linecap="round"/></svg>`;
-  const items=sel.map(id=>MEDS[p.kind].find(m=>m.id===id)).map(m=>`<div class="rxitem">${m.ic}<div><b>${m.name}</b><div>${m.txt}</div></div></div>`).join('');
-  const hoje=new Date().toLocaleDateString('pt-BR');const V=S.visit;
-  let extra='';
-  if(V.temp)extra+=`<div class="rxline"><b>Temperatura:</b> ${fmt(V.temp)} °C</div>`;
-  if(V.h)extra+=`<div class="rxline"><b>Altura e peso:</b> ${V.h} cm, ${fmt(V.w)} kg</div>`;
-  if(V.sticker)extra+=`<div class="rxline"><b>Adesivo de corajoso:</b> ${STICKERS[V.sticker]}</div>`;
-  if(V.curPhoto)extra+=`<div class="rxline"><b>Curativo:</b><br><img src="${V.curPhoto}" alt="" style="width:240px;max-width:100%;border-radius:12px;margin-top:4px"></div>`;
-  $('#receitaBox').innerHTML=`
-   <div class="rxhead">${logo}<div><h2>${p.kind==='pet'?'Clínica Veterinária':'Consultório'} da ${d.name}</h2><small>Receita • ${hoje}</small></div>${p.photo?`<img src="${p.photo}" alt="" style="width:86px;height:86px;border-radius:16px;object-fit:cover;margin-left:auto">`:''}</div>
-   <div class="rxline"><b>Paciente:</b> ${esc(p.name)} (${p.kind==='pet'?(p.species==='cachorro'?'cachorro':'gato')+', ':''}${sexWord(p)}, ${p.age} ${p.age===1?'ano':'anos'})</div>
-   <div class="rxline"><b>Diagnóstico:</b> ${dg.name}</div>
-   ${extra}
-   <div class="rxline" style="margin-top:12px"><b>Tratamento:</b></div>
-   ${items}
-   <div class="rxline" style="margin-top:12px">Volte logo para contar se melhorou!</div>
-   <div class="rxfoot"><div class="stamp">${d.name.toUpperCase()}<br>★ CRM ★<br>KIDS</div><div class="sign">${d.name}</div></div>`;
-  if(!S.visitSaved){V.diag=S.diag;V.meds=sel;V.notes=S.notes.map(stripTags);S.rec.visits.push(V);S.rec.last=Date.now();saveDB();S.visitSaved=true;bump(d.id)}
-  go('receita');tada();confetti();
-  setTimeout(()=>say(`Receita pronta! ${p.name} vai ficar ${S.diag==='saudavel'?'protegid'+(p.sex==='f'?'a':'o'):'bo'+(p.sex==='f'?'a':'m')} rapidinho. Muito bem, ${d.name.replace('Dra.','doutora')}!`),300);
-}
-
 /* ============ BANCO DE PACIENTES ============ */
 const DBKEY='consultorio-pacientes';
 function loadDB(){try{const d=JSON.parse(localStorage.getItem(DBKEY));if(d&&d.patients)return d}catch(e){}return {patients:[],senha:0}}
@@ -1171,16 +1711,19 @@ function saveDB(){
     try{localStorage.setItem(DBKEY,JSON.stringify(DB));return true}catch(e2){return false}}
 }
 const recById=id=>DB.patients.find(p=>p.id===id);
-const diagName=(p,id)=>(DIAGS[p.kind].find(d=>d.id===id)||{}).name||'';
+const diagName=(p,id)=>id==='retorno'?'Retorno: sarou!':(CASE[id]?CASE[id].name:(LEGACY[id]||''));
 const fmtDate=t=>new Date(t).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
 const stripTags=h=>String(h).replace(/<!--.*?-->/g,'').replace(/<[^>]+>/g,'').trim();
 function pic(p,opts){return p&&p.photo?`<img class="pphoto" src="${p.photo}" alt="">`:(p?avatar(p,opts||{}):'')}
-function newLook(kind,species){return kind==='pessoa'?{skin:pick(SKINS),hair:pick(HAIRS),shirt:pick(SHIRTS),pants:pick(['#3d5a80','#5c4b8a','#2f6f62','#7a4e2d']),bow:pick(['#ff5c9a','#ffd23f','#4dabf7','#69db7c']),motif:pick(['star','heart','stripe'])}:{fur:pick(species==='cachorro'?DOGC:CATC),pattern:Math.random()<.5?1:0}}
+function newLook(kind,species){if(kind==='pessoa')return {skin:pick(SKINS),hair:pick(HAIRS),shirt:pick(SHIRTS),pants:pick(['#3d5a80','#5c4b8a','#2f6f62','#7a4e2d']),bow:pick(['#ff5c9a','#ffd23f','#4dabf7','#69db7c']),motif:pick(['star','heart','stripe'])};const pal={cachorro:DOGC,gato:CATC,capivara:CAPIC,galinha:HENC,ursinho:BEARC,personagem:PLUSHC}[species]||DOGC;return {fur:pick(pal),pattern:Math.random()<.5?1:0}}
 function baseMetrics(r){
   if(r.kind==='pessoa'){
     if(r.age<18)return{h:Math.round(52+r.age*6.6+rnd(-3,3)),w:+(3.5+r.age*2.7+rnd(-1,2)).toFixed(1)};
     return{h:Math.round((r.sex==='f'?161:174)+rnd(-6,6)),w:+((r.sex==='f'?60:76)+rnd(-7,10)).toFixed(1)}}
-  const pup=r.age<=1;
+  const pup=r.age<=1;const sp=spOf(r);
+  if(sp==='capivara')return{h:Math.round(rnd(45,60)*(pup?.6:1)),w:+(rnd(35,60)*(pup?.4:1)).toFixed(1)};
+  if(sp==='galinha')return{h:Math.round(rnd(35,45)),w:+rnd(1.5,3).toFixed(1)};
+  if(r.kind==='pelucia')return{h:Math.round(rnd(20,60)),w:+rnd(.2,1).toFixed(1)};
   if(r.species==='cachorro')return{h:Math.round(rnd(25,60)*(pup?.6:1)),w:+(rnd(5,28)*(pup?.5:1)).toFixed(1)};
   return{h:Math.round(rnd(22,28)*(pup?.7:1)),w:+(rnd(3,5.5)*(pup?.5:1)).toFixed(1)};
 }
@@ -1197,7 +1740,7 @@ function showPacientes(){
   $('#plist').innerHTML=`<button class="pc new" onclick="newPatient()"><span><b>+</b>Paciente novo</span></button>`+ps.map(p=>{
     const lv=p.visits[p.visits.length-1];
     const stk=p.visits.filter(v=>v.sticker).slice(-6).map(v=>STICKERS[v.sticker]||'').join('');
-    return `<div class="pc" role="button" onclick="openPatient('${p.id}')"><button class="del" onclick="event.stopPropagation();delPatient(this,'${p.id}')">🗑</button><div class="pic">${pic(p)}</div>${esc(p.name)}<small>${p.visits.length} consulta${p.visits.length===1?'':'s'}${lv?' • '+diagName(p,lv.diag):''}</small><div class="stk">${stk}</div></div>`}).join('');
+    return `<div class="pc" role="button" onclick="openPatient('${p.id}')"><button class="del" onclick="event.stopPropagation();delPatient(this,'${p.id}')">🗑</button><div class="pic">${pic(p)}</div>${esc(p.name)}<small>${p.visits.length} consulta${p.visits.length===1?'':'s'}${lv?' • '+diagName(p,lv.diag):''}</small><div class="stk">${stk}</div>${p.pending?'<span class="retb">🩺 Retorno</span>':''}</div>`}).join('');
   go('pacientes');
 }
 function delPatient(btn,id){
@@ -1208,17 +1751,17 @@ function delPatient(btn,id){
 function openPatient(id){
   const r=recById(id);if(!r)return;click();
   S.editing=id;
-  S.form={kind:r.kind,species:r.species,sex:r.sex,queixa:null,photo:r.photo||null};
+  S.form={species:spOf(r),sex:r.sex,photo:r.photo||null};S.forceCase=null;
   $('#pName').value=r.name;$('#pAge').value=r.age;
   $('#fichaTitle').textContent='Prontuário da '+S.doc.name;
   refreshFicha();
   const lv=r.visits[r.visits.length-1];
   const bb=$('#backBanner');bb.classList.remove('hidden');
-  bb.innerHTML=`<div class="bp">${pic(r)}</div><div><b>Que bom te ver de novo, ${esc(r.name)}!</b><br>${lv?`Última consulta: ${diagName(r,lv.diag)} (${fmtDate(lv.date)}) com a ${DOCS[lv.doc]?DOCS[lv.doc].name:'doutora'}.`:'Primeira consulta registrada.'}</div>`;
-  go('ficha');setTimeout(()=>{const q=$('#queixaCh');if(q&&q.scrollIntoView)q.scrollIntoView({behavior:'smooth',block:'center'})},500);
+  bb.innerHTML=`<div class="bp">${pic(r)}</div><div><b>Que bom te ver de novo, ${esc(r.name)}!</b><br>${lv?`Última consulta: ${diagName(r,lv.diag)} (${fmtDate(lv.date)}) com a ${DOCS[lv.doc]?DOCS[lv.doc].name:'doutora'}.`:'Primeira consulta registrada.'}${r.pending?`<div class="actions" style="justify-content:flex-start;margin-top:8px"><button class="big" onclick="beginVisit(recById('${r.id}'),true)">🩺 Consulta de retorno</button></div><div style="font-size:16px;opacity:.75">Ou confira os dados abaixo para um problema novo.</div>`:''}</div>`;
+  go('ficha');
   const ele=r.sex==='f'?'ela':'ele';
   const last=lv?(lv.diag==='saudavel'?' Da última vez estava tudo bem.':` Da última vez foi ${diagName(r,lv.diag).toLowerCase()}.`):'';
-  say(`Que bom te ver de novo, ${r.name}!${last} O que ${r.kind==='pet'?ele:'você'} está sentindo hoje?`);
+  say(`Que bom te ver de novo, ${r.name}!${last}${r.pending?' Veio para o retorno?':''}`);
 }
 
 /* ---- foto ---- */
@@ -1249,116 +1792,10 @@ const STICKERS={
 };
 const STKNAME={estrela:'estrela',coracao:'coração',arcoiris:'arco-íris',foguete:'foguete',pata:'patinha',coroa:'coroa',flor:'flor',sol:'sol'};
 
-/* ---- icones das ferramentas novas ---- */
-TOOLS.push(
-  {id:'oto',name:'Otoscópio',ic:`<svg viewBox="0 0 100 100"><rect x="38" y="48" width="18" height="44" rx="8" fill="#4a5568"/><path d="M30 26 h34 l-6 24 H36Z" fill="#9aa5b8" stroke="#4a5568" stroke-width="3"/><path d="M64 30 L92 22 L92 46 L64 40Z" fill="#cfd6e2" stroke="#4a5568" stroke-width="3"/><circle cx="47" cy="36" r="6" fill="#ffd43b"/><path d="M94 26 l4 -4 M95 34 h5 M94 42 l4 4" stroke="#ffd43b" stroke-width="3" stroke-linecap="round"/></svg>`},
-  {id:'vac',name:'Vacina',ic:`<svg viewBox="0 0 100 100"><g transform="rotate(-40 50 50)"><rect x="20" y="40" width="50" height="20" rx="4" fill="#fff" stroke="#556" stroke-width="3"/><rect x="24" y="44" width="34" height="12" fill="#4dabf7"/><rect x="70" y="46" width="8" height="8" fill="#778"/><path d="M78 50 H98" stroke="#556" stroke-width="3"/><rect x="4" y="47" width="18" height="6" fill="#778"/><rect x="2" y="38" width="5" height="24" rx="2" fill="#778"/></g></svg>`},
-  {id:'ultra',name:'Ultrassom',ic:`<svg viewBox="0 0 100 100"><rect x="8" y="12" width="84" height="62" rx="10" fill="#222"/><path d="M50 18 L80 66 H20Z" fill="#555"/><ellipse cx="50" cy="50" rx="12" ry="9" fill="#ccc"/><circle cx="44" cy="46" r="5" fill="#ddd"/><rect x="40" y="78" width="20" height="14" rx="4" fill="#9aa5b8"/></svg>`},
-  {id:'scale',name:'Balança e régua',ic:`<svg viewBox="0 0 100 100"><rect x="70" y="8" width="20" height="84" rx="4" fill="#ffd43b" stroke="#e0a800" stroke-width="2"/><path d="M70 20 h8 M70 32 h12 M70 44 h8 M70 56 h12 M70 68 h8 M70 80 h12" stroke="#7a5b00" stroke-width="2"/><rect x="6" y="54" width="58" height="36" rx="10" fill="#e9ecef" stroke="#868e96" stroke-width="3"/><rect x="20" y="62" width="30" height="12" rx="3" fill="#cfe8c8"/></svg>`},
-  {id:'cur',name:'Curativos',ic:`<svg viewBox="0 0 100 100"><rect x="8" y="36" width="84" height="30" rx="15" fill="#ffc9a8" transform="rotate(-30 50 50)"/><rect x="36" y="36" width="28" height="30" rx="4" fill="#fff3ea" transform="rotate(-30 50 50)"/><g fill="#e8a27f" transform="rotate(-30 50 50)"><circle cx="20" cy="46" r="2.5"/><circle cx="20" cy="56" r="2.5"/><circle cx="80" cy="46" r="2.5"/><circle cx="80" cy="56" r="2.5"/></g></svg>`}
-);
-Object.assign(TOOL_OPEN,{oto:()=>openOto(),vac:()=>openVac(),ultra:()=>openUltra(),scale:()=>openScale(),cur:()=>openCur()});
-function later(fn,ms){const t=setTimeout(fn,ms);(window._to=window._to||[]).push(t);return t}
-function clearLater(){(window._to||[]).forEach(clearTimeout);window._to=[]}
-
-/* ============ OTOSCOPIO ============ */
-const EAR_SVG=`<defs><radialGradient id="earg" cx="50%" cy="50%" r="62%"><stop offset="0" stop-color="#3a1414"/><stop offset=".33" stop-color="#a24a4a"/><stop offset=".72" stop-color="#eda39b"/><stop offset="1" stop-color="#f7c6b8"/></radialGradient></defs><rect width="200" height="200" fill="url(#earg)"/><ellipse cx="100" cy="100" rx="34" ry="30" fill="#d9c8c0"/><path d="M100 100 l16 20 -22 4Z" fill="#fff" opacity=".75"/><ellipse cx="100" cy="100" rx="34" ry="30" fill="none" stroke="#a0524f" stroke-width="3"/>`;
-function throatSVG(inf){return `<rect width="200" height="200" fill="${inf?'#c2253b':'#e98a8a'}"/><path d="M0 0 H200 V74 Q100 24 0 74Z" fill="${inf?'#e0485c':'#f4b0aa'}"/><ellipse cx="100" cy="118" rx="38" ry="44" fill="#3a0a12"/><path d="M88 52 Q100 58 112 52 Q110 92 100 96 Q90 92 88 52Z" fill="${inf?'#ff6b7f':'#f6a3a0'}"/><ellipse cx="54" cy="118" rx="17" ry="27" fill="${inf?'#ff3b4e':'#f08f8f'}"/><ellipse cx="146" cy="118" rx="17" ry="27" fill="${inf?'#ff3b4e':'#f08f8f'}"/>${inf?'<g fill="#fff8e1"><circle cx="50" cy="110" r="3"/><circle cx="58" cy="124" r="2.5"/><circle cx="150" cy="112" r="3"/><circle cx="142" cy="126" r="2.5"/></g>':''}<path d="M6 200 Q20 140 100 142 Q180 140 194 200Z" fill="#ff8fa3"/><path d="M100 150 V196" stroke="#e86b87" stroke-width="3"/>`}
-function openOto(){
-  S.otoPart='ouvido';
-  openPanel('Otoscópio',`<div class="otowrap">
-    <div class="seg" id="otoSeg"><button class="choice sel" data-v="ouvido" onclick="otoPart('ouvido')">👂 Ouvido</button><button class="choice" data-v="garganta" onclick="otoPart('garganta')">👄 Garganta</button></div>
-    <div class="otoview" id="otoview"><video id="otovid" playsinline muted autoplay class="hidden"></video><svg id="otosvg" viewBox="0 0 200 200"></svg><svg id="otofind" viewBox="0 0 200 200"></svg><div class="flash"></div></div>
-    <div class="row" style="justify-content:center"><button class="redbtn" style="margin:0" id="otobtn" onclick="runOto()">OLHAR</button>
-      <button class="camtoggle hidden" id="torchb" onclick="toggleTorch()">💡 Lanterna</button>
-      <button class="camtoggle hidden" id="otocamb" onclick="otoCam()">📷 Usar o desenho</button></div>
-    <div class="result" id="otores"></div></div>`);
-  otoPart('ouvido',true);
-  if(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia)otoCam(true);
-  say('Encoste o tablet pertinho do ouvido e aperte olhar!');
-}
-function otoPart(v,silent){
-  if(!silent)click();S.otoPart=v;setSel('#otoSeg',v);
-  $('#otosvg').innerHTML=v==='ouvido'?EAR_SVG:throatSVG(false);$('#otofind').innerHTML='';
-  $('#otores').textContent=v==='ouvido'?'Encoste o tablet pertinho do ouvido e aperte OLHAR.':'Peça para abrir bem a boca e falar AAAA!';
-  if(!silent)say(v==='garganta'?'Abre bem a boca e fala aaaaaa!':'Vamos olhar dentro do ouvido!');
-}
-async function otoCam(auto){
-  if(camStream&&!auto){stopCam();S.torch=false;$('#otoview').classList.remove('cam');$('#torchb').classList.add('hidden');$('#otocamb').textContent='📷 Usar a câmera';return}
-  const ok=await camOn('#otovid');
-  if(!$('#otoview'))return;
-  if(ok){$('#otoview').classList.add('cam');$('#otocamb').classList.remove('hidden');$('#otocamb').textContent='🖼️ Usar o desenho';
-    try{const tr=camStream.getVideoTracks()[0];const caps=tr.getCapabilities?tr.getCapabilities():{};if(caps.torch)$('#torchb').classList.remove('hidden')}catch(e){}}
-  else if(!auto){$('#otocamb').textContent='A câmera não abriu aqui';$('#otocamb').disabled=true}
-}
-function toggleTorch(force){
-  if(!camStream)return;S.torch=force===undefined?!S.torch:force;
-  try{camStream.getVideoTracks()[0].applyConstraints({advanced:[{torch:S.torch}]}).catch(()=>{})}catch(e){}
-  const b=$('#torchb');if(b)b.textContent=S.torch?'💡 Apagar lanterna':'💡 Lanterna';
-}
-function runOto(){
-  const p=S.p,part=S.otoPart,v=$('#otoview');
-  $('#otobtn').disabled=true;v.classList.add('lit');tone(1200,.05,'square',.05);
-  if(camStream&&!$('#torchb').classList.contains('hidden'))toggleTorch(true);
-  $('#otores').innerHTML='<span class="pulse">Olhando...</span>';
-  S.otoFind=S.otoFind||{};
-  if(!S.otoFind[part])S.otoFind[part]=part==='ouvido'?(p.cond==='febre'&&Math.random()<.5?'vermelho':(Math.random()<.35?'cera':'limpo')):(p.cond==='febre'?'inflamada':'saudavel');
-  const f=S.otoFind[part];
-  later(()=>{
-    if(!$('#otoview'))return;
-    v.classList.remove('lit');$('#otobtn').disabled=false;
-    let html='',txt,bad=true;
-    if(f==='cera'){html='<g fill="#c99a2e" opacity=".9"><circle cx="78" cy="122" r="11"/><circle cx="92" cy="132" r="7"/><circle cx="126" cy="84" r="9"/><circle cx="118" cy="76" r="5"/></g>';txt='Achei uma sujeirinha no ouvido! Precisa limpar.'}
-    else if(f==='vermelho'){html='<rect width="200" height="200" fill="rgba(255,0,40,.3)"/>';txt='O ouvido está vermelhinho. Por isso a febre!'}
-    else if(f==='inflamada'){html=camStream?'<rect width="200" height="200" fill="rgba(255,0,40,.3)"/>':'';if(!camStream)$('#otosvg').innerHTML=throatSVG(true);txt='A garganta está vermelha e inflamada!'}
-    else{bad=false;txt=part==='ouvido'?'O ouvido está limpinho!':'A garganta está rosadinha e saudável!'}
-    $('#otofind').innerHTML=html;
-    $('#otores').innerHTML=`<span class="${bad?'bad':'ok'}">${txt}</span>`;say(txt);
-    if(bad)oops();else{tone(880,.15,'sine',.12);tone(1320,.2,'sine',.12,.15)}
-    addNote('oto-'+part,`${part==='ouvido'?'Ouvido':'Garganta'}: <b class="${bad?'bad':'ok'}">${txt.replace(/!$/,'')}</b>`);S.done.oto=true;renderTools();
-  },1600);
-}
-
-/* ============ VACINA ============ */
-function openVac(){
-  const p=S.p;let ticks='';for(let i=0;i<7;i++)ticks+=`<path d="M${82+i*20} 40 v12" stroke="#99a" stroke-width="2"/>`;
-  openPanel('Vacina',`<div class="vacstage"><div class="vp">${pic(p,{})}</div>
-    <svg viewBox="0 0 320 120" width="380" style="max-width:100%">
-      <rect x="60" y="40" width="160" height="40" rx="6" fill="#fff" stroke="#99a" stroke-width="3"/>
-      <rect id="liquid" x="66" y="45" width="150" height="30" rx="3" fill="#4dabf7" opacity=".85"/>${ticks}
-      <rect x="220" y="54" width="20" height="12" fill="#99a"/><path d="M240 60 H314" stroke="#778" stroke-width="3"/>
-      <g id="plunger"><rect x="12" y="56" width="58" height="8" fill="#778"/><rect x="4" y="36" width="10" height="48" rx="3" fill="#778"/><rect x="62" y="44" width="8" height="32" fill="#556"/></g>
-    </svg><div class="count" id="vcount"></div></div>
-    <button class="redbtn" id="vbtn" onclick="runVac()">VACINA</button>
-    <div class="result" id="vres">Aperte o botão quando o paciente estiver pronto!</div><div id="vstk"></div>`);
-  say('Hora da vacina! Vai ser rapidinho.');
-}
-function runVac(){
-  const p=S.p,o=p.sex==='f'?'a':'o';$('#vbtn').disabled=true;$('#vres').textContent='Respira fundo...';
-  ['3','2','1'].forEach((n,i)=>later(()=>{if(!$('#vcount'))return;$('#vcount').textContent=n;tone(600+i*120,.18,'sine',.2);say(['três','dois','um'][i])},i*950));
-  later(()=>{
-    if(!$('#vcount'))return;$('#vcount').textContent='';
-    $('#plunger').style.transform='translateX(140px)';$('#liquid').style.transform='scaleX(.04)';
-    noise(.5,3000,1,.4,0,'highpass');tone(1400,.12,'square',.12,.2,1800);
-  },2900);
-  later(()=>{
-    if(!$('#vres'))return;
-    const ph=p.kind==='pet'?(p.species==='cachorro'?'Au au! Nem doeu, até abanou o rabinho!':'Miau! Ficou bravinho, mas já passou!'):pick(['Ai! Ah... nem doeu nada!','Fui muito corajos'+o+'!','Nem senti, doutora!']);
-    $('#vres').innerHTML=`<span class="ok">Vacina tomada! ${ph}</span>`;say(ph);tada();
-    $('#vstk').innerHTML=`<div class="center" style="font-size:22px;font-weight:600;margin-top:8px">Escolha o adesivo de corajoso:</div><div class="stickers">${Object.keys(STICKERS).map(k=>`<button data-k="${k}" onclick="pickSticker('${k}')">${STICKERS[k]}</button>`).join('')}</div>`;
-    addNote('vac','Vacina: <b class="ok">tomada</b>');S.done.vac=true;renderTools();
-  },4000);
-}
-function pickSticker(k){
-  S.visit.sticker=k;document.querySelectorAll('#vstk .stickers button').forEach(b=>b.classList.toggle('sel',b.dataset.k===k));
-  tada();say('Adesivo de '+STKNAME[k]+'! Parabéns pela coragem!');
-  addNote('vac',`Vacina: <b class="ok">tomada</b> • adesivo ${STICKERS[k]}`);
-}
-
 /* ============ ULTRASSOM ============ */
 function openUltra(){
-  const p=S.p,canBaby=p.sex==='f'&&(p.kind==='pet'?p.age>=1:p.age>=18);
-  openPanel('Ultrassom',`<div class="seg" id="usSeg" style="justify-content:center;margin-bottom:10px"><button class="choice sel" data-v="barriga" onclick="usMode('barriga')">Barriga</button>${canBaby?`<button class="choice" data-v="bebe" onclick="usMode('bebe')">${p.kind==='pet'?'Filhotinhos':'Bebê'}</button>`:''}</div>
+  const p=S.p,canBaby=p.sex==='f'&&p.kind!=='pelucia'&&(p.kind==='pet'?p.age>=1:p.age>=18);
+  openPanel('Ultrassom',`<div class="seg" id="usSeg" style="justify-content:center;margin-bottom:10px"><button class="choice sel" data-v="barriga" onclick="usMode('barriga')">Barriga</button>${canBaby?`<button class="choice" data-v="bebe" onclick="usMode('bebe')">${spOf(p)==='galinha'?'Ovinho':p.kind==='pet'?'Filhotinhos':'Bebê'}</button>`:''}</div>
     <div class="ultra"><canvas id="uscv" width="640" height="420"></canvas></div>
     <button class="redbtn" id="usbtn" onclick="runUltra()">LIGAR</button><div class="result" id="usres">Passe o gel geladinho na barriga e aperte LIGAR.</div>`);
   S.usMode='barriga';usDraw(0,0);
@@ -1372,7 +1809,7 @@ function runUltra(){
   if(mode==='bebe'){
     if(!S.baby)S.baby=p.kind==='pet'?{n:2+Math.floor(Math.random()*4)}:{t:pick(['menina','menino','menina','menino','gemeas','gemeos'])};
     window._hb=setInterval(()=>{noise(.18,320,2,1.1,0,'bandpass',200);tone(240,.12,'sine',.12,0,180)},420);later(()=>clearInterval(window._hb),9000);
-  }else{bellySound(p.cond==='barriga')}
+  }else{bellySound(p.f.barriga==='forte'?true:p.f.barriga==='leve'?'leve':false)}
   const t0=performance.now();
   const loop=now=>{const t=(now-t0)/1000;usDraw(t,Math.min(1,t/1.8));window._raf=requestAnimationFrame(loop)};
   window._raf=requestAnimationFrame(loop);
@@ -1380,10 +1817,10 @@ function runUltra(){
     if(!$('#usres'))return;$('#usbtn').disabled=false;
     let txt,bad=false;
     if(mode==='bebe'){
-      if(p.kind==='pet')txt=`Vai ter ${S.baby.n} filhotinhos!`;
+      if(spOf(p)==='galinha')txt='Tem um ovinho a caminho!';else if(p.kind==='pet')txt=`Vai ter ${S.baby.n} filhotinhos!`;
       else txt={menina:'É uma menina!',menino:'É um menino!',gemeas:'São gêmeas! Duas meninas!',gemeos:'São gêmeos! Dois meninos!'}[S.baby.t];
       tada();
-    }else if(p.cond==='barriga'){txt='Muitos gases! Bolhinhas por toda a barriga.';bad=true}
+    }else if(p.f.barriga==='forte'){txt='Muitos gases! Bolhinhas por toda a barriga.';bad=true}else if(p.f.xray&&p.f.xray.t==='objeto'){txt='Tem uma coisa redondinha na barriga!';bad=true}
     else txt='Barriga normal, tudo no lugarzinho!';
     $('#usres').innerHTML=`<span class="${bad?'bad':'ok'}">${txt}</span>`;say(txt);
     addNote('ultra-'+mode,`Ultrassom (${mode==='bebe'?(p.kind==='pet'?'filhotes':'bebê'):'barriga'}): <b class="${bad?'bad':'ok'}">${txt.replace(/!$/,'')}</b>`);S.done.ultra=true;renderTools();
@@ -1403,13 +1840,14 @@ function usDraw(t,rev){
         x.strokeStyle='#bdbdbd';x.lineWidth=14*k;x.lineCap='round';x.beginPath();x.moveTo(ox+10*k,oy+30*k);x.quadraticCurveTo(ox-20*k,oy+70*k,ox-40*k,oy+40*k);x.stroke();
         x.beginPath();x.moveTo(ox+80*k,oy+30*k);x.quadraticCurveTo(ox+60*k,oy+80*k,ox+20*k,oy+70*k);x.stroke();
         x.fillStyle='#fff';x.beginPath();x.arc(ox+5*k,oy+2*k,(5+5*beat)*k,0,7);x.fill()};
-      if(S.p.kind==='pet'){const n=(S.baby&&S.baby.n)||3;for(let i=0;i<n;i++){const ox=180+i*(280/Math.max(1,n-1||1)),oy=240+(i%2?30:-20);x.fillStyle='#bdbdbd';x.beginPath();x.ellipse(ox,oy,38,28,0,0,7);x.fill();x.beginPath();x.arc(ox-30,oy-10,18,0,7);x.fill();x.fillStyle='#fff';x.beginPath();x.arc(ox,oy,3+4*beat,0,7);x.fill()}}
+      if(spOf(S.p)==='galinha'){x.fillStyle='#e0e0e0';x.beginPath();x.ellipse(320,250,60,80,0,0,7);x.fill();x.fillStyle='#fff';x.beginPath();x.arc(320,250,18+6*beat,0,7);x.fill()}
+      else if(S.p.kind==='pet'){const n=(S.baby&&S.baby.n)||3;for(let i=0;i<n;i++){const ox=180+i*(280/Math.max(1,n-1||1)),oy=240+(i%2?30:-20);x.fillStyle='#bdbdbd';x.beginPath();x.ellipse(ox,oy,38,28,0,0,7);x.fill();x.beginPath();x.arc(ox-30,oy-10,18,0,7);x.fill();x.fillStyle='#fff';x.beginPath();x.arc(ox,oy,3+4*beat,0,7);x.fill()}}
       else if(S.baby&&(S.baby.t==='gemeas'||S.baby.t==='gemeos')){fetus(240,220,.62);fetus(400,290,.62)}
       else fetus(330,245,1);
     }else{
       x.strokeStyle='#9e9e9e';x.lineWidth=7;
       [[250,200,60,34],[360,190,70,30],[300,280,80,36],[420,290,50,30],[210,300,46,28]].forEach(([a,b,rx,ry])=>{x.beginPath();x.ellipse(a,b,rx,ry,.3,0,7);x.stroke()});
-      const gas=S.p.cond==='barriga';x.fillStyle='#f5f5f5';
+      const gas=S.p.f&&S.p.f.barriga==='forte';x.fillStyle='#f5f5f5';
       for(let i=0;i<(gas?22:4);i++){const bx=180+(i*67)%300,by=380-((t*40*(1+i%3)+i*53)%260);x.beginPath();x.arc(bx,by,(gas?7:4)+(i%3)*2,0,7);x.fill()}
     }
     x.filter='none';x.globalAlpha=1;
@@ -1436,7 +1874,7 @@ function openScale(){
 function nextMeasures(){
   const r=S.rec;if(!r.base)r.base=baseMetrics(r);
   const prev=[...r.visits].reverse().find(v=>v.h);
-  const growing=(r.kind==='pessoa'&&r.age<18)||(r.kind==='pet'&&r.age<=1);
+  const growing=(r.kind==='pessoa'&&r.age<18)||(r.kind==='pet'&&r.age<=1&&spOf(r)!=='galinha');
   if(!prev)return{h:r.base.h,w:r.base.w,prev:null};
   return{h:prev.h+(growing?Math.round(rnd(0,3)):0),w:+Math.max(.5,prev.w+(growing?rnd(.1,.9):rnd(-.6,.6))).toFixed(1),prev};
 }
@@ -1575,10 +2013,8 @@ function confetti(){
 }
 
 /* ============ INICIO ============ */
-$('#icoPessoa').innerHTML=personSVG({sex:'f',age:8,look:{skin:'#f9d3b4',hair:'#6b3f22',shirt:'#4dabf7'}});
-$('#icoPet').innerHTML=petSVG({species:'cachorro',sex:'m',age:3,look:{fur:'#c8874a'}});
-$('#icoDog').innerHTML=petSVG({species:'cachorro',sex:'f',age:3,look:{fur:'#f1d3a1'}});
-$('#icoCat').innerHTML=petSVG({species:'gato',sex:'m',age:3,look:{fur:'#f39c3d'}});
+$('#specCh').innerHTML=Object.keys(SPECIES).map(sp=>{const demo={species:sp,kind:kindOf(sp),sex:sp==='galinha'?'f':'m',age:3,look:sp==='pessoa'?{skin:'#f9d3b4',hair:'#6b3f22',shirt:'#4dabf7',pants:'#3d5a80',motif:'star'}:{fur:{cachorro:'#c8874a',gato:'#f39c3d',capivara:'#8d6a48',galinha:'#ffffff',ursinho:'#b07a4a',personagem:'#c3a6ff'}[sp],pattern:1}};
+  return `<button class="choice" data-v="${sp}" onclick="setSpecies('${sp}')">${sp==='personagem'?'<span class="camico">📷</span>':avatar(demo,{})}${SPECIES[sp].label}</button>`}).join('');
 $('#eName').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addQueueNew()}});
 $('#pName').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('#pName').blur()}});
 if('speechSynthesis' in window){try{speechSynthesis.getVoices();speechSynthesis.onvoiceschanged=()=>{}}catch(e){}}
